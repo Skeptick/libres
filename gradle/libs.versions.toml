@@ -1,0 +1,33 @@
+[versions]
+plugin-android = "7.3.0"
+plugin-publish-maven = "0.22.0"
+plugin-publish-plugin = "1.1.0"
+plugin-multiplatform-compose = "1.2.2"
+
+kotlin = "1.7.20"
+androidx-core = "1.9.0"
+robovm = "1.0.0"
+icu4j = "70.1"
+jackson = "2.14.0"
+kotlinpoet = "1.12.0"
+javacv = "1.5.7"
+android-sdk-tools = "30.3.1"
+
+junit = "4.13.2"
+
+[libraries]
+plugin-android = { module = "com.android.tools.build:gradle", version.ref = "plugin-android" }
+plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+plugin-publish-maven = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "plugin-publish-maven" }
+plugin-multiplatform-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "plugin-multiplatform-compose" }
+
+androidx-core = { module = "androidx.core:core", version.ref = "androidx-core" }
+robovm = { module = "org.robovm:robovm-rt", version.ref = "robovm" }
+icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
+jackson-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
+jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
+javacv = { module = "org.bytedeco:javacv-platform", version.ref = "javacv" }
+android-sdk-tools = { module = "com.android.tools:sdk-common", version.ref = "android-sdk-tools" }
+
+junit = { module = "junit:junit", version.ref = "junit" }
