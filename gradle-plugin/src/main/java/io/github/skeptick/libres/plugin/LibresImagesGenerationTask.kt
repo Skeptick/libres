@@ -60,7 +60,7 @@ abstract class LibresImagesGenerationTask : DefaultTask() {
             outputPackageName = outputPackageName,
             outputClassName = outputClassName,
             platforms = outputSourcesDirectories.keys,
-            iosBundleName = project.appleBundleName
+            appleBundleName = project.appleBundleName
         )
 
         imageProps.forEach { builder.appendImage(it) }

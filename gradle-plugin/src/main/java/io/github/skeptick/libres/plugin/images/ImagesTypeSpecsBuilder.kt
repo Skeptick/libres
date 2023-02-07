@@ -14,11 +14,11 @@ internal class ImagesTypeSpecsBuilder(
     private val outputPackageName: String,
     private val outputClassName: String,
     private val platforms: Set<KotlinPlatform>,
-    private val iosBundleName: String
+    private val appleBundleName: String
 ) {
 
     private var imagesObjects = platforms.associateWith {
-        ImagesObject(outputClassName, it, KotlinPlatform.Common in platforms, iosBundleName)
+        ImagesObject(outputClassName, it, KotlinPlatform.Common in platforms, appleBundleName)
     }
 
     fun appendImage(imageProps: ImageProps) {

@@ -5,25 +5,25 @@ import java.nio.file.Files
 import kotlin.io.path.Path
 import kotlin.io.path.pathString
 
-internal const val iosImagesDirectory = "generated/libres/ios/resources/images"
+internal const val appleImagesDirectory = "generated/libres/apple/resources/images"
 
 // {
-//     'LibresCommon' => ['common/build/generated/libres/ios/resources/LibresCommon.xcassets'],
-//     'LibresFeature' => ['feature/build/generated/libres/ios/resources/LibresFeature.xcassets'],
+//     'LibresCommon' => ['common/build/generated/libres/apple/resources/LibresCommon.xcassets'],
+//     'LibresFeature' => ['feature/build/generated/libres/apple/resources/LibresFeature.xcassets'],
 // }
 internal fun List<Project>.appleImageBundles(rootProject: Project): String =
     joinToString(separator = ",\n", prefix = "{\n", postfix = "\n    }") {
         val bundleName = it.appleBundleName
-        "        '${bundleName}' => ['${rootProject.buildDir.relativeTo(rootProject.projectDir).path}/$iosImagesDirectory/$bundleName.xcassets']"
+        "        '${bundleName}' => ['${rootProject.buildDir.relativeTo(rootProject.projectDir).path}/$appleImagesDirectory/$bundleName.xcassets']"
     }
 
 internal fun List<Project>.createSymLinks(rootProject: Project) {
-    val assetsDir = Path(rootProject.buildDir.absolutePath, iosImagesDirectory)
+    val assetsDir = Path(rootProject.buildDir.absolutePath, appleImagesDirectory)
     Files.createDirectories(assetsDir)
 
     forEach { project ->
         val bundleName = project.appleBundleName
-        val target = Path(project.buildDir.absolutePath, iosImagesDirectory, "$bundleName.xcassets")
+        val target = Path(project.buildDir.absolutePath, appleImagesDirectory, "$bundleName.xcassets")
         val link = Path(assetsDir.pathString, "$bundleName.xcassets")
 
         if (!Files.exists(link)) {

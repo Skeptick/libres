@@ -11,11 +11,11 @@ import io.github.skeptick.libres.plugin.KotlinPlatform
 @Suppress("PrivatePropertyName")
 private val NSBundle = ClassName("platform.Foundation", "NSBundle")
 
-internal fun ImagesObject(name: String, platform: KotlinPlatform, hasCommon: Boolean, iosBundleName: String): TypeSpec.Builder {
+internal fun ImagesObject(name: String, platform: KotlinPlatform, hasCommon: Boolean, appleBundleName: String): TypeSpec.Builder {
     return when {
         platform == KotlinPlatform.Common -> ExpectImagesObject(name)
-        platform == KotlinPlatform.Apple && hasCommon -> ActualImagesObjectApple(name, iosBundleName)
-        platform == KotlinPlatform.Apple -> ImagesObjectApple(name, iosBundleName)
+        platform == KotlinPlatform.Apple && hasCommon -> ActualImagesObjectApple(name, appleBundleName)
+        platform == KotlinPlatform.Apple -> ImagesObjectApple(name, appleBundleName)
         !hasCommon -> ImagesObject(name)
         else -> ActualImagesObject(name)
     }
