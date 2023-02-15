@@ -31,7 +31,7 @@ internal fun ImageProps.saveImage(directories: Map<KotlinPlatform, File>) {
     if (targetSize == null) {
         saveOriginal(directories)
     } else {
-        val src = opencv_imgcodecs.imread(file.absolutePath)
+        val src = opencv_imgcodecs.imread(file.absolutePath, opencv_imgcodecs.IMREAD_UNCHANGED)
         for (scale in ImageScale.values()) {
             if (!directories.any { it.key in scale.supportedPlatforms }) continue
             val newSideSize = targetSize * scale
