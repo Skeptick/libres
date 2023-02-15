@@ -170,7 +170,7 @@ class ResourcesPlugin : Plugin<Project> {
 
         project.tasks.apply {
             getByName("build").dependsOn(resourcesTask)
-            withType(GenerateResValues::class.java).configureEach { it.dependsOn(imagesTask) }
+            if (isAndroid) withType(GenerateResValues::class.java).configureEach { it.dependsOn(imagesTask) }
             withType(KotlinCompile::class.java).configureEach { it.dependsOn(resourcesTask) }
         }
     }
