@@ -2,6 +2,7 @@ package io.github.skeptick.libres.plugin.common.project
 
 import org.gradle.api.Project
 import java.nio.file.Files
+import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.pathString
 
@@ -17,23 +18,23 @@ internal fun List<Project>.appleImageBundles(rootProject: Project): String =
         "        '${bundleName}' => ['${rootProject.buildDir.relativeTo(rootProject.projectDir).path}/$appleImagesDirectory/$bundleName.xcassets']"
     }
 
-internal fun List<Project>.createSymLinks(rootProject: Project) {
-    val assetsDir = Path(rootProject.buildDir.absolutePath, appleImagesDirectory)
-    Files.createDirectories(assetsDir)
-
-    forEach { project ->
-        val bundleName = project.appleBundleName
-        val target = Path(project.buildDir.absolutePath, appleImagesDirectory, "$bundleName.xcassets")
-        val link = Path(assetsDir.pathString, "$bundleName.xcassets")
-
-        if (!Files.exists(link)) {
-            Files.createDirectories(target)
-            Files.createSymbolicLink(link, target)
-        }
-    }
+internal fun createAssetsSymLinks(rootProject: Project, exportedProjects: List<Project>) {
+    val rootImagesDir = Path(rootProject.buildDir.absolutePath, appleImagesDirectory)
+    val rootBundleName = rootProject.appleBundleName
+    val rootAssetsDir = Path(rootProject.buildDir.absolutePath, appleImagesDirectory, "$rootBundleName.xcassets")
+    Files.createDirectories(rootAssetsDir)
+    exportedProjects.forEach { rootImagesDir.addSymlinkToAssets(it) }
 }
 
 internal val Project.appleBundleName: String
     get() = "Libres" + path.split(":", "-", "_").joinToString("") { partOfName ->
         partOfName.replaceFirstChar { it.titlecase() }
     }
+
+private fun Path.addSymlinkToAssets(project: Project) {
+    val bundleName = project.appleBundleName
+    val target = Path(project.buildDir.absolutePath, appleImagesDirectory, "$bundleName.xcassets")
+    val link = Path(pathString, "$bundleName.xcassets")
+    Files.createDirectories(target)
+    if (!Files.exists(link)) Files.createSymbolicLink(link, target)
+}

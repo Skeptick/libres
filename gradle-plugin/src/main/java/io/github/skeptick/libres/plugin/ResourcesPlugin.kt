@@ -2,7 +2,6 @@ package io.github.skeptick.libres.plugin
 
 import io.github.skeptick.libres.VERSION
 import io.github.skeptick.libres.plugin.common.project.*
-import io.github.skeptick.libres.plugin.common.project.createSymLinks
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.api.DefaultAndroidSourceFile
 import com.android.build.gradle.tasks.GenerateResValues
@@ -137,7 +136,7 @@ class ResourcesPlugin : Plugin<Project> {
             task.outputDirectory = mainSourceSet.sourcesDir.toOutputDirectory(stringsOutputPackageName)
         }
 
-        val imagesTask = project.tasks.register(GENERATE_IMAGES_TASK_NAME, io.github.skeptick.libres.plugin.LibresImagesGenerationTask::class.java) { task ->
+        val imagesTask = project.tasks.register(GENERATE_IMAGES_TASK_NAME, LibresImagesGenerationTask::class.java) { task ->
             task.group = TASK_GROUP
             task.outputPackageName = imagesOutputPackageName
             task.outputClassName = pluginExtension.generatedClassName
@@ -186,7 +185,7 @@ class ResourcesPlugin : Plugin<Project> {
                 task.doLast {
                     multiplatformExtension.cocoapodsExtensionOrNull?.let {
                         val exports = getCocoapodsExports(multiplatformExtension)
-                        if (exports.isNotEmpty()) exports.createSymLinks(project)
+                        createAssetsSymLinks(project, exports)
                         it.extraSpecAttributes["resource_bundles"] = (exports + project).appleImageBundles(project)
                     }
                 }
@@ -200,7 +199,8 @@ class ResourcesPlugin : Plugin<Project> {
 
     private fun Project.getCocoapodsExports(multiplatformExtension: KotlinMultiplatformExtension): List<Project> {
         val configName = multiplatformExtension.cocoapodsExportConfigurationName ?: return emptyList()
-        return configurations.getByName(configName).dependencies.filterIsInstance<ProjectDependency>().map { it.dependencyProject }
+        val exports = configurations.getByName(configName).dependencies.filterIsInstance<ProjectDependency>().map { it.dependencyProject }
+        return exports.filter { it.plugins.hasPlugin(ResourcesPlugin::class.java) }
     }
 
     companion object {
