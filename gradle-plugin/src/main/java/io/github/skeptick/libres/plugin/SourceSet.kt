@@ -83,7 +83,7 @@ internal fun BaseExtension.findAndroidSourceSet(
 // Android isn't kotlin (-_-)
 internal val KotlinTarget.platform: KotlinPlatform?
     get() = when (this) {
-        is KotlinJvmTarget, is KotlinWithJavaTarget<*> -> KotlinPlatform.Jvm
+        is KotlinJvmTarget, is KotlinWithJavaTarget<*, *> -> KotlinPlatform.Jvm
         is KotlinJsIrTarget -> KotlinPlatform.Js
         is KotlinNativeTarget -> when (konanTarget.family) {
             Family.IOS, Family.OSX -> KotlinPlatform.Apple

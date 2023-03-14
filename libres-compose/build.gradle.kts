@@ -11,10 +11,15 @@ android {
 
 kotlin {
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 api(projects.libresCore)
                 compileOnly(compose.ui)
+            }
+        }
+        appleMain {
+            dependencies {
+                implementation(compose.ui)
             }
         }
     }
