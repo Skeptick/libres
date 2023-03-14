@@ -9,7 +9,7 @@ Resources generation in Kotlin Multiplatform.
 
 buildscript {
     dependencies {
-        classpath("io.github.skeptick.libres:gradle-plugin:1.1.5")
+        classpath("io.github.skeptick.libres:gradle-plugin:1.1.6")
     }
 }
 ```
@@ -22,9 +22,10 @@ plugins {
 }
 
 libres {
-    generatedClassName = "MainRes"
-    generateNamedArguments = true
-    baseLocaleLanguageCode = "ru"
+    generatedClassName = "MainRes" // "Res" by default
+    generateNamedArguments = true // false by default
+    baseLocaleLanguageCode = "ru" // "en" by default
+    camelCaseNamesForAppleFramework = true // false by default
 }
 ```
 
@@ -170,7 +171,7 @@ Image size in Figma is **240x89**. Final image name is **pic_(orig)_(240).png**
 kotlin {
     commonMain {
         dependencies {
-            implementation("io.github.skeptick.libres:libres-compose:1.1.5")
+            implementation("io.github.skeptick.libres:libres-compose:1.1.6")
         }
     }
 }
