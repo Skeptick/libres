@@ -2,9 +2,6 @@
 
 package io.github.skeptick.libres.strings
 
-import kotlin.native.concurrent.SharedImmutable
-
-@SharedImmutable
 private val RegularFormatRegex = "%(\\d)\\$[s]".toRegex()
 
 class VoidFormattedString(private val value: String) {
