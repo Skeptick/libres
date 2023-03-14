@@ -1,10 +1,12 @@
 package io.github.skeptick.libres.plugin.strings.declarations
 
 import com.squareup.kotlinpoet.*
+import io.github.skeptick.libres.plugin.common.declarations.addObjCNameAnnotation
 import io.github.skeptick.libres.plugin.strings.models.LanguageCode
 import io.github.skeptick.libres.plugin.strings.models.PluralsResource
 import io.github.skeptick.libres.plugin.strings.models.StringResource
 import io.github.skeptick.libres.plugin.strings.models.TextResource
+import io.github.skeptick.libres.plugin.strings.snakeCaseToCamelCase
 import io.github.skeptick.libres.plugin.strings.unescapeXml
 import io.github.skeptick.libres.strings.PluralForms
 import io.github.skeptick.libres.strings.getCurrentLanguageCode
@@ -62,7 +64,9 @@ internal fun TypeSpec.Builder.addTextResourceToStringsObject(
                 FunSpec.getterBuilder()
                     .addStatement("return locales[${::getCurrentLanguageCode.name}()]?.$name ?: baseLocale.$name")
                     .build()
-            ).build()
+            ).addObjCNameAnnotation(camelCaseForApple) {
+                name.snakeCaseToCamelCase(startWithLower = true)
+            }.build()
     )
 }
 

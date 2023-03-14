@@ -3,9 +3,10 @@ package io.github.skeptick.libres.plugin.images.declarations
 import com.squareup.kotlinpoet.*
 import io.github.skeptick.libres.plugin.KotlinPlatform
 import io.github.skeptick.libres.plugin.ResourcesPlugin
+import io.github.skeptick.libres.plugin.common.declarations.addObjCNameAnnotation
 import io.github.skeptick.libres.plugin.images.models.ImageProps
+import io.github.skeptick.libres.plugin.strings.snakeCaseToCamelCase
 
-@Suppress("PrivatePropertyName")
 private val Image = ClassName(ResourcesPlugin.IMAGES_PACKAGE_NAME, "Image")
 
 internal fun TypeSpec.Builder.appendImage(
@@ -16,8 +17,10 @@ internal fun TypeSpec.Builder.appendImage(
 ): TypeSpec.Builder {
     return when {
         platform == KotlinPlatform.Common -> appendExpectImage(specs.name)
-        !hasCommon -> appendImage(specs.name, specs.initializerLiteral(platform))
-        else -> appendActualImage(specs.name, specs.initializerLiteral(platform))
+        platform == KotlinPlatform.Apple && hasCommon -> appendActualImage(specs.name, specs.initializerLiteral(platform), camelCaseForApple)
+        platform == KotlinPlatform.Apple -> appendImage(specs.name, specs.initializerLiteral(platform), camelCaseForApple)
+        !hasCommon -> appendImage(specs.name, specs.initializerLiteral(platform), camelCaseForApple = false)
+        else -> appendActualImage(specs.name, specs.initializerLiteral(platform), camelCaseForApple = false)
     }
 }
 
@@ -48,8 +51,9 @@ private fun TypeSpec.Builder.appendActualImage(
                 FunSpec.getterBuilder()
                     .addStatement("return $initializerLiteral", name)
                     .build()
-            )
-            .build()
+            ).addObjCNameAnnotation(camelCaseForApple) {
+                name.snakeCaseToCamelCase(startWithLower = true)
+            }.build()
     )
 }
 
@@ -68,8 +72,9 @@ private fun TypeSpec.Builder.appendImage(
                 FunSpec.getterBuilder()
                     .addStatement("return $initializerLiteral", name)
                     .build()
-            )
-            .build()
+            ).addObjCNameAnnotation(camelCaseForApple) {
+                name.snakeCaseToCamelCase(startWithLower = true)
+            }.build()
     )
 }
 

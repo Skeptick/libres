@@ -4,6 +4,7 @@ package io.github.skeptick.libres.plugin.strings.declarations
 
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import io.github.skeptick.libres.plugin.common.declarations.addExperimentalObjCNameAnnotation
 import io.github.skeptick.libres.plugin.strings.capitalizeUS
 import io.github.skeptick.libres.plugin.strings.models.LanguageCode
 import io.github.skeptick.libres.plugin.strings.models.PluralsResource
@@ -46,6 +47,7 @@ internal fun StringObject(
     camelCaseForApple: Boolean
 ): TypeSpec.Builder {
     return TypeSpec.objectBuilder("${name}Strings")
+        .addExperimentalObjCNameAnnotation(camelCaseForApple)
         .addProperty(
             PropertySpec.builder("baseLocale", ClassName(packageName, "Strings${baseLanguageCode.capitalizeUS()}"))
                 .addModifiers(KModifier.PRIVATE)
