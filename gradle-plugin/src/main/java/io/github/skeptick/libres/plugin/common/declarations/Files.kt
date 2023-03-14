@@ -6,7 +6,11 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
 import java.io.File
 
-internal fun ResourcesFile(packageName: String, name: String, resourcesObjectBuilder: TypeSpec.Builder): FileSpec {
+internal fun ResourcesFile(
+    packageName: String,
+    name: String,
+    resourcesObjectBuilder: TypeSpec.Builder
+): FileSpec {
     return FileSpec.builder(packageName, name)
         .addType(resourcesObjectBuilder.build())
         .build()

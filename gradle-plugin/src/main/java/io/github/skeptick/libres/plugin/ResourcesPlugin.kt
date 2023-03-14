@@ -124,10 +124,13 @@ class ResourcesPlugin : Plugin<Project> {
 
         val stringsTask = project.tasks.register(GENERATE_STRINGS_TASK_NAME, LibresStringGenerationTask::class.java) { task ->
             task.group = TASK_GROUP
-            task.outputPackageName = stringsOutputPackageName
-            task.outputClassName = pluginExtension.generatedClassName
-            task.generateNamedArguments = pluginExtension.generateNamedArguments
-            task.baseLocaleLanguageCode = pluginExtension.baseLocaleLanguageCode
+            task.settings = StringsSettings(
+                outputPackageName = stringsOutputPackageName,
+                outputClassName = pluginExtension.generatedClassName,
+                generateNamedArguments = pluginExtension.generateNamedArguments,
+                baseLocaleLanguageCode = pluginExtension.baseLocaleLanguageCode,
+                camelCaseForApple = pluginExtension.camelCaseNamesForAppleFramework && allSourceSets.any { it.platform == KotlinPlatform.Apple }
+            )
             task.inputDirectory = fileTree(stringsInputDirectory) { config ->
                 config.include { element ->
                     !element.isDirectory && element.file.extension.lowercase() in STRINGS_EXTENSIONS
@@ -138,8 +141,12 @@ class ResourcesPlugin : Plugin<Project> {
 
         val imagesTask = project.tasks.register(GENERATE_IMAGES_TASK_NAME, LibresImagesGenerationTask::class.java) { task ->
             task.group = TASK_GROUP
-            task.outputPackageName = imagesOutputPackageName
-            task.outputClassName = pluginExtension.generatedClassName
+            task.settings = ImagesSettings(
+                outputPackageName = imagesOutputPackageName,
+                outputClassName = pluginExtension.generatedClassName,
+                camelCaseForApple = pluginExtension.camelCaseNamesForAppleFramework,
+                appleBundleName = project.appleBundleName
+            )
             task.inputDirectory = fileTree(imagesInputDirectory) { config ->
                 config.include { element ->
                     !element.isDirectory && element.file.extension.lowercase() in IMAGES_EXTENSIONS
@@ -159,10 +166,12 @@ class ResourcesPlugin : Plugin<Project> {
 
         val resourcesTask = project.tasks.register(GENERATE_RESOURCES_TASK_NAME, LibresResourcesGenerationTask::class.java) { task ->
             task.group = TASK_GROUP
-            task.outputPackageName = outputPackageName.orEmpty()
-            task.outputClassName = pluginExtension.generatedClassName
-            task.stringsPackageName = stringsOutputPackageName
-            task.imagesPackageName = imagesOutputPackageName
+            task.settings = ResourcesSettings(
+                outputPackageName = outputPackageName.orEmpty(),
+                outputClassName = pluginExtension.generatedClassName,
+                stringsPackageName = stringsOutputPackageName,
+                imagesPackageName = imagesOutputPackageName
+            )
             task.outputDirectory = mainSourceSet.sourcesDir.toOutputDirectory(outputPackageName.orEmpty())
             task.dependsOn(stringsTask)
             task.dependsOn(imagesTask)

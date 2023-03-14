@@ -14,16 +14,7 @@ import java.io.File
 abstract class LibresStringGenerationTask : DefaultTask() {
 
     @get:Input
-    internal abstract var outputPackageName: String
-
-    @get:Input
-    internal abstract var outputClassName: String
-
-    @get:Input
-    internal abstract var generateNamedArguments: Boolean
-
-    @get:Input
-    internal abstract var baseLocaleLanguageCode: String
+    internal abstract var settings: StringsSettings
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -37,23 +28,17 @@ abstract class LibresStringGenerationTask : DefaultTask() {
         outputDirectory.deleteFilesInDirectory()
         inputDirectory.files
             .takeIf { files -> files.isNotEmpty() }
-            ?.let { files -> parseStringResources(files, baseLocaleLanguageCode) }
-            ?.takeIf { resources -> resources.getValue(baseLocaleLanguageCode).isNotEmpty() }
+            ?.let { files -> parseStringResources(files, settings.baseLocaleLanguageCode) }
+            ?.takeIf { resources -> resources.getValue(settings.baseLocaleLanguageCode).isNotEmpty() }
             ?.let { resources -> buildResources(resources) }
             ?: buildEmptyResources()
     }
 
     private fun buildResources(resources: Map<LanguageCode, List<TextResource>>) {
-        val builder = StringTypeSpecsBuilder(
-            outputPackageName = outputPackageName,
-            outputClassName = outputClassName,
-            generateNamedArguments = generateNamedArguments,
-            baseLanguageCode = baseLocaleLanguageCode,
-            languageCodes = resources.keys
-        )
-
+        val builder = StringTypeSpecsBuilder(settings, resources.keys)
         val resourceByLanguageCodes = resources.mapValues { it.value.associateBy(TextResource::name) }
-        resources.getValue(baseLocaleLanguageCode).forEach { baseResource ->
+
+        resources.getValue(settings.baseLocaleLanguageCode).forEach { baseResource ->
             builder.appendResource(
                 baseResource = baseResource,
                 localizedResources = resources.mapValues {
@@ -62,12 +47,14 @@ abstract class LibresStringGenerationTask : DefaultTask() {
             )
         }
 
+        outputDirectory.deleteFilesInDirectory()
         builder.save(outputDirectory)
     }
 
     private fun buildEmptyResources() {
-        val stringObjectTypeSpec = EmptyStringObject(outputClassName)
-        val stringsFileSpec = StringsObjectFile(outputPackageName, stringObjectTypeSpec)
+        val stringObjectTypeSpec = EmptyStringObject(settings.outputClassName)
+        val stringsFileSpec = StringsObjectFile(settings.outputPackageName, stringObjectTypeSpec)
+        outputDirectory.deleteFilesInDirectory()
         stringsFileSpec.saveToDirectory(outputDirectory)
     }
 

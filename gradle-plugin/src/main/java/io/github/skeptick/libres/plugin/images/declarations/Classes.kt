@@ -7,21 +7,31 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import io.github.skeptick.libres.plugin.KotlinPlatform
+import io.github.skeptick.libres.plugin.common.declarations.addExperimentalObjCNameAnnotation
 
-@Suppress("PrivatePropertyName")
 private val NSBundle = ClassName("platform.Foundation", "NSBundle")
 
-internal fun ImagesObject(name: String, platform: KotlinPlatform, hasCommon: Boolean, appleBundleName: String): TypeSpec.Builder {
+internal fun ImagesObject(
+    name: String,
+    platform: KotlinPlatform,
+    hasCommon: Boolean,
+    appleBundleName: String,
+    camelCaseForApple: Boolean
+): TypeSpec.Builder {
     return when {
         platform == KotlinPlatform.Common -> ExpectImagesObject(name)
-        platform == KotlinPlatform.Apple && hasCommon -> ActualImagesObjectApple(name, appleBundleName)
-        platform == KotlinPlatform.Apple -> ImagesObjectApple(name, appleBundleName)
+        platform == KotlinPlatform.Apple && hasCommon -> ActualImagesObjectApple(name, appleBundleName, camelCaseForApple)
+        platform == KotlinPlatform.Apple -> ImagesObjectApple(name, appleBundleName, camelCaseForApple)
         !hasCommon -> ImagesObject(name)
         else -> ActualImagesObject(name)
     }
 }
 
-internal fun EmptyImagesObject(name: String, platform: KotlinPlatform, hasCommon: Boolean): TypeSpec.Builder {
+internal fun EmptyImagesObject(
+    name: String,
+    platform: KotlinPlatform,
+    hasCommon: Boolean
+): TypeSpec.Builder {
     return when {
         platform == KotlinPlatform.Common -> ExpectImagesObject(name)
         !hasCommon -> ImagesObject(name)
@@ -50,8 +60,13 @@ private fun ActualImagesObject(name: String): TypeSpec.Builder {
  *     private val bundle: NSBundle = NSBundle.bundleWithName(bundleName)
  * }
  */
-private fun ActualImagesObjectApple(name: String, bundleName: String): TypeSpec.Builder {
+private fun ActualImagesObjectApple(
+    name: String,
+    bundleName: String,
+    camelCaseNames: Boolean
+): TypeSpec.Builder {
     return TypeSpec.objectBuilder("${name}Images")
+        .addExperimentalObjCNameAnnotation(camelCaseNames)
         .addModifiers(KModifier.ACTUAL)
         .appendAppleBundleProperty(bundleName)
 }
@@ -68,8 +83,13 @@ private fun ImagesObject(name: String): TypeSpec.Builder {
  *     private val bundle: NSBundle = NSBundle.bundleWithName(bundleName)
  * }
  */
-private fun ImagesObjectApple(name: String, bundleName: String): TypeSpec.Builder {
+private fun ImagesObjectApple(
+    name: String,
+    bundleName: String,
+    camelCaseNames: Boolean
+): TypeSpec.Builder {
     return TypeSpec.objectBuilder("${name}Images")
+        .addExperimentalObjCNameAnnotation(camelCaseNames)
         .appendAppleBundleProperty(bundleName)
 }
 

@@ -1,10 +1,12 @@
 package io.github.skeptick.libres.plugin.strings.declarations
 
 import com.squareup.kotlinpoet.*
+import io.github.skeptick.libres.plugin.common.declarations.addObjCNameAnnotation
 import io.github.skeptick.libres.plugin.strings.models.LanguageCode
 import io.github.skeptick.libres.plugin.strings.models.PluralsResource
 import io.github.skeptick.libres.plugin.strings.models.StringResource
 import io.github.skeptick.libres.plugin.strings.models.TextResource
+import io.github.skeptick.libres.plugin.strings.snakeCaseToCamelCase
 import io.github.skeptick.libres.plugin.strings.unescapeXml
 import io.github.skeptick.libres.strings.PluralForms
 import io.github.skeptick.libres.strings.getCurrentLanguageCode
@@ -12,7 +14,10 @@ import io.github.skeptick.libres.strings.getCurrentLanguageCode
 /*
  * val string_name: ClassName?
  */
-internal fun TypeSpec.Builder.addTextResourceToInterface(name: String, type: ClassName): TypeSpec.Builder {
+internal fun TypeSpec.Builder.addTextResourceToInterface(
+    name: String,
+    type: ClassName
+): TypeSpec.Builder {
     return addProperty(
         PropertySpec.builder(name, type.copy(nullable = true)).build()
     )
@@ -22,7 +27,12 @@ internal fun TypeSpec.Builder.addTextResourceToInterface(name: String, type: Cla
  * for string: override val string_name: ClassName = ClassName(value)
  * for plural: override val plural_name: ClassName = ClassName(PluralForms("one", "two"), "ru")
  */
-internal fun TypeSpec.Builder.addTextResourceToLocalizedObject(name: String, resource: TextResource?, type: ClassName, languageCode: LanguageCode): TypeSpec.Builder {
+internal fun TypeSpec.Builder.addTextResourceToLocalizedObject(
+    name: String,
+    resource: TextResource?,
+    type: ClassName,
+    languageCode: LanguageCode
+): TypeSpec.Builder {
     return addProperty(
         PropertySpec.builder(name, type.copy(nullable = resource == null))
             .addModifiers(KModifier.OVERRIDE)
@@ -43,14 +53,20 @@ internal fun TypeSpec.Builder.addTextResourceToLocalizedObject(name: String, res
  * val string_name: ClassName
  *    get() = locales[getCurrentLanguageCode()]?.string_name ?: baseLocale.string_name
  */
-internal fun TypeSpec.Builder.addTextResourceToStringsObject(name: String, type: ClassName): TypeSpec.Builder {
+internal fun TypeSpec.Builder.addTextResourceToStringsObject(
+    name: String,
+    type: ClassName,
+    camelCaseForApple: Boolean
+): TypeSpec.Builder {
     return addProperty(
         PropertySpec.builder(name, type)
             .getter(
                 FunSpec.getterBuilder()
                     .addStatement("return locales[${::getCurrentLanguageCode.name}()]?.$name ?: baseLocale.$name")
                     .build()
-            ).build()
+            ).addObjCNameAnnotation(camelCaseForApple) {
+                name.snakeCaseToCamelCase(startWithLower = true)
+            }.build()
     )
 }
 

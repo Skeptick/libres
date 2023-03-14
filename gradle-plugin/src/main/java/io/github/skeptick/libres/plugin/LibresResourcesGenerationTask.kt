@@ -15,25 +15,21 @@ import java.io.File
 abstract class LibresResourcesGenerationTask : DefaultTask() {
 
     @get:Input
-    internal abstract var outputPackageName: String
-
-    @get:Input
-    internal abstract var outputClassName: String
-
-    @get:Input
-    internal abstract var stringsPackageName: String
-
-    @get:Input
-    internal abstract var imagesPackageName: String
+    internal abstract var settings: ResourcesSettings
 
     @get:OutputDirectory
     internal abstract var outputDirectory: File
 
     @TaskAction
     fun apply() {
+        val className = settings.outputClassName
+        val packageName = settings.outputPackageName
+        val stringsPackageName = settings.stringsPackageName
+        val imagesPackageName = settings.imagesPackageName
+
         outputDirectory.deleteFilesInDirectory()
-        val resourcesObjectTypeSpec = ResourcesObject(outputClassName, stringsPackageName, imagesPackageName)
-        val resourcesFileSpec = ResourcesFile(outputPackageName, outputClassName, resourcesObjectTypeSpec)
+        val resourcesObjectTypeSpec = ResourcesObject(className, stringsPackageName, imagesPackageName)
+        val resourcesFileSpec = ResourcesFile(packageName, className, resourcesObjectTypeSpec)
         resourcesFileSpec.saveToDirectory(outputDirectory)
     }
 
