@@ -12,7 +12,11 @@ import com.squareup.kotlinpoet.TypeSpec
  *     val image: MainResImages = MainResImages
  * }
  */
-internal fun ResourcesObject(name: String, stringsPackageName: String, imagesPackageName: String): TypeSpec.Builder {
+internal fun ResourcesObject(
+    name: String,
+    stringsPackageName: String,
+    imagesPackageName: String
+): TypeSpec.Builder {
     return TypeSpec.objectBuilder(name)
         .addProperty(
             PropertySpec.builder("string", ClassName(stringsPackageName, "${name}Strings"))

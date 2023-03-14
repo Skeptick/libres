@@ -13,6 +13,7 @@ private val xmlMapper = XmlMapper()
 internal fun parseStringResources(inputFiles: Set<File>, baseLocaleLanguageCode: LanguageCode): Resources {
     val filesByLocale = inputFiles.groupBy { it.name.substringAfterLast("_").substringBefore(".") }
     if (filesByLocale[baseLocaleLanguageCode].isNullOrEmpty()) throw BaseStringResourcesNotFoundException()
+
     val resources = filesByLocale.mapValues { (_, files) -> files.map(xmlMapper::readTree).flatMap(JsonNode::parseResources) }
     resources.validateNames(baseLocaleLanguageCode)
     resources.validateDuplicatesAndArguments()

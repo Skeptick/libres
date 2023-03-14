@@ -5,6 +5,7 @@ package io.github.skeptick.libres.plugin.strings
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
+import io.github.skeptick.libres.plugin.StringsSettings
 import io.github.skeptick.libres.plugin.common.declarations.saveToDirectory
 import io.github.skeptick.libres.plugin.strings.declarations.*
 import io.github.skeptick.libres.plugin.strings.models.*
@@ -12,39 +13,40 @@ import io.github.skeptick.libres.strings.*
 import java.io.File
 
 internal class StringTypeSpecsBuilder(
-    private val outputPackageName: String,
-    private val outputClassName: String,
-    private val generateNamedArguments: Boolean,
-    private val baseLanguageCode: LanguageCode,
+    private val settings: StringsSettings,
     private val languageCodes: Set<LanguageCode>
 ) {
 
+    private val packageName = settings.outputPackageName
+    private val className = settings.outputClassName
+    private val baseLanguageCode = settings.baseLocaleLanguageCode
+    private val generateNamedArguments = settings.generateNamedArguments
+    private val camelCaseForApple = settings.camelCaseForApple
+
     private val stringsInterface = StringsInterface()
-    private val localizedObjects = languageCodes.associateWith { LocalizedStringsObject(outputPackageName, it) }
+    private val localizedObjects = languageCodes.associateWith { LocalizedStringsObject(packageName, it) }
     private val baseLocalizedObject = localizedObjects.getValue(baseLanguageCode)
-    private val stringObject = StringObject(outputPackageName, outputClassName, baseLanguageCode, languageCodes)
+    private val stringObject = StringObject(packageName, className, baseLanguageCode, languageCodes, camelCaseForApple)
     private val customClasses = mutableListOf<TypeSpec.Builder>()
 
     fun appendResource(baseResource: TextResource, localizedResources: Map<LanguageCode, TextResource?>) {
         val resourceName = baseResource.name
         val baseParameters = baseResource.parameters
         val formattedResource = baseResource.replaceParameters(baseParameters, baseLanguageCode)
-        val type = baseResource.fetchClass(outputPackageName, baseParameters.isNotEmpty(), generateNamedArguments)
+        val type = baseResource.fetchClass(packageName, baseParameters.isNotEmpty(), generateNamedArguments)
 
         baseResource.appendLocalizedResources(localizedResources, type)
         stringsInterface.addTextResourceToInterface(resourceName, type)
         baseLocalizedObject.addTextResourceToLocalizedObject(resourceName, formattedResource, type, baseLanguageCode)
-        stringObject.addTextResourceToStringsObject(resourceName, type)
-        if (generateNamedArguments && baseParameters.isNotEmpty()) {
-            customClasses += CustomFormattedTextResourceClass(baseResource)
-        }
+        stringObject.addTextResourceToStringsObject(resourceName, type, camelCaseForApple)
+        if (generateNamedArguments && baseParameters.isNotEmpty()) customClasses += CustomFormattedTextResourceClass(baseResource)
     }
 
     fun save(outputDirectory: File) {
-        StringsInterfaceFile(outputPackageName, stringsInterface).saveToDirectory(outputDirectory)
-        StringsObjectFile(outputPackageName, stringObject).saveToDirectory(outputDirectory)
-        localizedObjects.forEach { StringsObjectFile(outputPackageName, it.value).saveToDirectory(outputDirectory) }
-        if (customClasses.isNotEmpty()) FormattedClassesFile(outputPackageName, customClasses).saveToDirectory(outputDirectory)
+        StringsInterfaceFile(packageName, stringsInterface).saveToDirectory(outputDirectory)
+        StringsObjectFile(packageName, stringObject).saveToDirectory(outputDirectory)
+        localizedObjects.forEach { StringsObjectFile(packageName, it.value).saveToDirectory(outputDirectory) }
+        if (customClasses.isNotEmpty()) FormattedClassesFile(packageName, customClasses).saveToDirectory(outputDirectory)
     }
 
     private fun TextResource.appendLocalizedResources(localizedResources: Map<LanguageCode, TextResource?>, type: ClassName) {

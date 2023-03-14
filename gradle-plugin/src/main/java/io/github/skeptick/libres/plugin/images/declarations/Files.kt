@@ -7,7 +7,11 @@ import com.squareup.kotlinpoet.TypeSpec
 import io.github.skeptick.libres.plugin.KotlinPlatform
 import io.github.skeptick.libres.plugin.ResourcesPlugin
 
-internal fun ImagesObjectFile(packageName: String, imagesObjectBuilder: TypeSpec.Builder, platform: KotlinPlatform): FileSpec {
+internal fun ImagesObjectFile(
+    packageName: String,
+    imagesObjectBuilder: TypeSpec.Builder,
+    platform: KotlinPlatform
+): FileSpec {
     return imagesObjectBuilder.build().let { imagesObject ->
         FileSpec.builder(packageName, imagesObject.name!!)
             .addImport(ResourcesPlugin.IMAGES_PACKAGE_NAME, "Image")

@@ -8,10 +8,15 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import io.github.skeptick.libres.plugin.KotlinPlatform
 
-@Suppress("PrivatePropertyName")
 private val NSBundle = ClassName("platform.Foundation", "NSBundle")
 
-internal fun ImagesObject(name: String, platform: KotlinPlatform, hasCommon: Boolean, appleBundleName: String): TypeSpec.Builder {
+internal fun ImagesObject(
+    name: String,
+    platform: KotlinPlatform,
+    hasCommon: Boolean,
+    appleBundleName: String,
+    camelCaseForApple: Boolean
+): TypeSpec.Builder {
     return when {
         platform == KotlinPlatform.Common -> ExpectImagesObject(name)
         platform == KotlinPlatform.Apple && hasCommon -> ActualImagesObjectApple(name, appleBundleName)
@@ -21,7 +26,11 @@ internal fun ImagesObject(name: String, platform: KotlinPlatform, hasCommon: Boo
     }
 }
 
-internal fun EmptyImagesObject(name: String, platform: KotlinPlatform, hasCommon: Boolean): TypeSpec.Builder {
+internal fun EmptyImagesObject(
+    name: String,
+    platform: KotlinPlatform,
+    hasCommon: Boolean
+): TypeSpec.Builder {
     return when {
         platform == KotlinPlatform.Common -> ExpectImagesObject(name)
         !hasCommon -> ImagesObject(name)
@@ -50,7 +59,11 @@ private fun ActualImagesObject(name: String): TypeSpec.Builder {
  *     private val bundle: NSBundle = NSBundle.bundleWithName(bundleName)
  * }
  */
-private fun ActualImagesObjectApple(name: String, bundleName: String): TypeSpec.Builder {
+private fun ActualImagesObjectApple(
+    name: String,
+    bundleName: String,
+    camelCaseNames: Boolean
+): TypeSpec.Builder {
     return TypeSpec.objectBuilder("${name}Images")
         .addModifiers(KModifier.ACTUAL)
         .appendAppleBundleProperty(bundleName)
@@ -68,7 +81,11 @@ private fun ImagesObject(name: String): TypeSpec.Builder {
  *     private val bundle: NSBundle = NSBundle.bundleWithName(bundleName)
  * }
  */
-private fun ImagesObjectApple(name: String, bundleName: String): TypeSpec.Builder {
+private fun ImagesObjectApple(
+    name: String,
+    bundleName: String,
+    camelCaseNames: Boolean
+): TypeSpec.Builder {
     return TypeSpec.objectBuilder("${name}Images")
         .appendAppleBundleProperty(bundleName)
 }

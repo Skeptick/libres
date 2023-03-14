@@ -8,7 +8,12 @@ import io.github.skeptick.libres.plugin.images.models.ImageProps
 @Suppress("PrivatePropertyName")
 private val Image = ClassName(ResourcesPlugin.IMAGES_PACKAGE_NAME, "Image")
 
-internal fun TypeSpec.Builder.appendImage(specs: ImageProps, platform: KotlinPlatform, hasCommon: Boolean): TypeSpec.Builder {
+internal fun TypeSpec.Builder.appendImage(
+    specs: ImageProps,
+    platform: KotlinPlatform,
+    hasCommon: Boolean,
+    camelCaseForApple: Boolean
+): TypeSpec.Builder {
     return when {
         platform == KotlinPlatform.Common -> appendExpectImage(specs.name)
         !hasCommon -> appendImage(specs.name, specs.initializerLiteral(platform))
@@ -31,7 +36,11 @@ private fun TypeSpec.Builder.appendExpectImage(name: String): TypeSpec.Builder {
  * actual val image_name: Image
  *     get() = "image_name"
  */
-private fun TypeSpec.Builder.appendActualImage(name: String, initializerLiteral: String): TypeSpec.Builder {
+private fun TypeSpec.Builder.appendActualImage(
+    name: String,
+    initializerLiteral: String,
+    camelCaseForApple: Boolean
+): TypeSpec.Builder {
     return addProperty(
         PropertySpec.builder(name, Image)
             .addModifiers(KModifier.ACTUAL)
@@ -48,7 +57,11 @@ private fun TypeSpec.Builder.appendActualImage(name: String, initializerLiteral:
  * val image_name: Image
  *     get() = "image_name"
  */
-private fun TypeSpec.Builder.appendImage(name: String, initializerLiteral: String): TypeSpec.Builder {
+private fun TypeSpec.Builder.appendImage(
+    name: String,
+    initializerLiteral: String,
+    camelCaseForApple: Boolean
+): TypeSpec.Builder {
     return addProperty(
         PropertySpec.builder(name, Image)
             .getter(

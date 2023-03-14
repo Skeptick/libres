@@ -12,7 +12,10 @@ import io.github.skeptick.libres.strings.getCurrentLanguageCode
 /*
  * val string_name: ClassName?
  */
-internal fun TypeSpec.Builder.addTextResourceToInterface(name: String, type: ClassName): TypeSpec.Builder {
+internal fun TypeSpec.Builder.addTextResourceToInterface(
+    name: String,
+    type: ClassName
+): TypeSpec.Builder {
     return addProperty(
         PropertySpec.builder(name, type.copy(nullable = true)).build()
     )
@@ -22,7 +25,12 @@ internal fun TypeSpec.Builder.addTextResourceToInterface(name: String, type: Cla
  * for string: override val string_name: ClassName = ClassName(value)
  * for plural: override val plural_name: ClassName = ClassName(PluralForms("one", "two"), "ru")
  */
-internal fun TypeSpec.Builder.addTextResourceToLocalizedObject(name: String, resource: TextResource?, type: ClassName, languageCode: LanguageCode): TypeSpec.Builder {
+internal fun TypeSpec.Builder.addTextResourceToLocalizedObject(
+    name: String,
+    resource: TextResource?,
+    type: ClassName,
+    languageCode: LanguageCode
+): TypeSpec.Builder {
     return addProperty(
         PropertySpec.builder(name, type.copy(nullable = resource == null))
             .addModifiers(KModifier.OVERRIDE)
@@ -43,7 +51,11 @@ internal fun TypeSpec.Builder.addTextResourceToLocalizedObject(name: String, res
  * val string_name: ClassName
  *    get() = locales[getCurrentLanguageCode()]?.string_name ?: baseLocale.string_name
  */
-internal fun TypeSpec.Builder.addTextResourceToStringsObject(name: String, type: ClassName): TypeSpec.Builder {
+internal fun TypeSpec.Builder.addTextResourceToStringsObject(
+    name: String,
+    type: ClassName,
+    camelCaseForApple: Boolean
+): TypeSpec.Builder {
     return addProperty(
         PropertySpec.builder(name, type)
             .getter(

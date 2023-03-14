@@ -21,10 +21,7 @@ import java.io.File
 abstract class LibresImagesGenerationTask : DefaultTask() {
 
     @get:Input
-    internal abstract var outputPackageName: String
-
-    @get:Input
-    internal abstract var outputClassName: String
+    internal abstract var settings: ImagesSettings
 
     @get:Incremental
     @get:InputFiles
@@ -56,22 +53,18 @@ abstract class LibresImagesGenerationTask : DefaultTask() {
     }
 
     private fun buildImages(imageProps: List<ImageProps>) {
-        val builder = ImagesTypeSpecsBuilder(
-            outputPackageName = outputPackageName,
-            outputClassName = outputClassName,
-            platforms = outputSourcesDirectories.keys,
-            appleBundleName = project.appleBundleName
-        )
-
+        val builder = ImagesTypeSpecsBuilder(settings, outputSourcesDirectories.keys)
         imageProps.forEach { builder.appendImage(it) }
+        outputSourcesDirectories.forEach { it.value.deleteFilesInDirectory() }
         builder.save(outputSourcesDirectories)
     }
 
     private fun buildEmptyImages() {
         val hasCommon = KotlinPlatform.Common in outputSourcesDirectories.keys
         outputSourcesDirectories.forEach { (platform, directory) ->
-            val imagesObjectTypeSpec = EmptyImagesObject(outputClassName, platform, hasCommon)
-            val imagesObjectFileSpec = ImagesObjectFile(outputPackageName, imagesObjectTypeSpec, platform)
+            val imagesObjectTypeSpec = EmptyImagesObject(settings.outputClassName, platform, hasCommon)
+            val imagesObjectFileSpec = ImagesObjectFile(settings.outputPackageName, imagesObjectTypeSpec, platform)
+            directory.deleteFilesInDirectory()
             imagesObjectFileSpec.saveToDirectory(directory)
         }
     }

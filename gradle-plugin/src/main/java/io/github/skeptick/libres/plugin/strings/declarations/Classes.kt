@@ -13,7 +13,6 @@ import io.github.skeptick.libres.plugin.strings.snakeCaseToCamelCase
 import io.github.skeptick.libres.strings.PluralForms
 import io.github.skeptick.libres.strings.formatString
 import io.github.skeptick.libres.strings.getPluralizedString
-import java.util.*
 
 /*
  * interface Strings
@@ -25,7 +24,10 @@ internal fun StringsInterface(): TypeSpec.Builder {
 /*
  * object StringsRu : Strings
  */
-internal fun LocalizedStringsObject(packageName: String, languageCode: LanguageCode): TypeSpec.Builder {
+internal fun LocalizedStringsObject(
+    packageName: String,
+    languageCode: LanguageCode
+): TypeSpec.Builder {
     return TypeSpec.objectBuilder("Strings${languageCode.capitalizeUS()}")
         .addSuperinterface(ClassName(packageName, "Strings"))
 }
@@ -36,7 +38,13 @@ internal fun LocalizedStringsObject(packageName: String, languageCode: LanguageC
  *     private val locales: Map<String, Strings> = mapOf("ru" to StringsRu, "en" to StringsEn)
  * }
  */
-internal fun StringObject(packageName: String, name: String, baseLanguageCode: LanguageCode, languageCodes: Set<LanguageCode>): TypeSpec.Builder {
+internal fun StringObject(
+    packageName: String,
+    name: String,
+    baseLanguageCode: LanguageCode,
+    languageCodes: Set<LanguageCode>,
+    camelCaseForApple: Boolean
+): TypeSpec.Builder {
     return TypeSpec.objectBuilder("${name}Strings")
         .addProperty(
             PropertySpec.builder("baseLocale", ClassName(packageName, "Strings${baseLanguageCode.capitalizeUS()}"))
