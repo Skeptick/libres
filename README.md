@@ -81,7 +81,7 @@ Android or JVM:
 
 ### Strings
 Strings are stored in the usual for Android form in `xml` files.  
-The file postfix must contain the code of the language for which the strings are intended. Ex: `my_app_strings_en.xml`  
+The file postfix must contain the code of the language for which the strings are intended. E.g.: `my_app_strings_en.xml`  
 For each of the languages you can create several files and they will be merged during compilation.
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -106,10 +106,13 @@ Swift:
 MainRes.shared.string.simple_string
 ```
 ***
-> ⚠️ Note: In the example above `MainRes.string.simple_string` will return a string, 
+> **Note**
+> In the example above `MainRes.string.simple_string` will return a string, 
 > so for better localization support it's not recommended to store the value. 
 > Get it directly at the place where it's displayed in the UI. 
 > This seems familiar but the ability to work directly with strings instead of resource IDs can be misused.
+***
+#### [More about localization](docs/LOCALIZATION.md)
 
 ### Images
 
