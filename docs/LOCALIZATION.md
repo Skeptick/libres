@@ -17,7 +17,7 @@ Locale.setDefault(Locale("en"))
 
 **iOS & MacOS**
 ```swift
-UserDefaults.standard.set("en", forKey: "AppleLanguages")
+UserDefaults.standard.set(["en"], forKey: "AppleLanguages")
 ```
 > **Note**
 > All used localizations must be declared in XCode project settings.
