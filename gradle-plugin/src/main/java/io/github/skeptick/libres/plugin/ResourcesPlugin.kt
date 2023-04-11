@@ -84,7 +84,6 @@ class ResourcesPlugin : Plugin<Project> {
         }
     }
 
-    // Some kind of magic (or shitcode)
     private fun Project.fetchSourceSets() {
         val outputDirectory = File(project.buildDir, "generated/libres")
         val kotlinExtension = project.extensions.getByType(KotlinProjectExtension::class.java)
@@ -179,8 +178,11 @@ class ResourcesPlugin : Plugin<Project> {
 
         project.tasks.apply {
             getByName("build").dependsOn(resourcesTask)
-            if (isAndroid) withType(GenerateResValues::class.java).configureEach { it.dependsOn(imagesTask) }
             withType(KotlinCompile::class.java).configureEach { it.dependsOn(resourcesTask) }
+            if (isAndroid) withType(GenerateResValues::class.java).configureEach { it.dependsOn(imagesTask) }
+            findByPath("desktopProcessResources")?.dependsOn(imagesTask)
+            findByPath("desktopSourcesJar")?.dependsOn(resourcesTask)
+            findByPath("jsProcessResources")?.dependsOn(imagesTask)
         }
     }
 
