@@ -9,6 +9,8 @@ fun NSBundle.Companion.bundleWithName(name: String): NSBundle {
     return NSBundle.bundleWithURL(url = url) ?: error("Cannot access $name.bundle")
 }
 
-fun NSBundle.image(name: String): NSImage {
-    return imageForResource(name) ?: error("Image $name not found")
+fun NSBundle.image(name: String, extension: String): NSImage {
+    val image = imageForResource(name) ?: error("Image $name not found")
+    image.setName("$name.$extension")
+    return image
 }

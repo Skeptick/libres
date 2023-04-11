@@ -16,20 +16,20 @@ internal fun TypeSpec.Builder.appendImage(
     camelCaseForApple: Boolean
 ): TypeSpec.Builder {
     return when {
-        platform == KotlinPlatform.Common -> appendExpectImage(specs.name)
-        platform == KotlinPlatform.Apple && hasCommon -> appendActualImage(specs.name, specs.initializerLiteral(platform), camelCaseForApple)
-        platform == KotlinPlatform.Apple -> appendImage(specs.name, specs.initializerLiteral(platform), camelCaseForApple)
-        !hasCommon -> appendImage(specs.name, specs.initializerLiteral(platform), camelCaseForApple = false)
-        else -> appendActualImage(specs.name, specs.initializerLiteral(platform), camelCaseForApple = false)
+        platform == KotlinPlatform.Common -> appendExpectImage(specs)
+        platform == KotlinPlatform.Apple && hasCommon -> appendActualImage(specs, specs.initializerLiteral(platform), camelCaseForApple)
+        platform == KotlinPlatform.Apple -> appendImage(specs, specs.initializerLiteral(platform), camelCaseForApple)
+        !hasCommon -> appendImage(specs, specs.initializerLiteral(platform), camelCaseForApple = false)
+        else -> appendActualImage(specs, specs.initializerLiteral(platform), camelCaseForApple = false)
     }
 }
 
 /**
  * expect val image_name: Image
  */
-private fun TypeSpec.Builder.appendExpectImage(name: String): TypeSpec.Builder {
+private fun TypeSpec.Builder.appendExpectImage(specs: ImageProps): TypeSpec.Builder {
     return addProperty(
-        PropertySpec.builder(name, Image)
+        PropertySpec.builder(specs.name, Image)
             .addModifiers(KModifier.EXPECT)
             .build()
     )
@@ -40,19 +40,19 @@ private fun TypeSpec.Builder.appendExpectImage(name: String): TypeSpec.Builder {
  *     get() = "image_name"
  */
 private fun TypeSpec.Builder.appendActualImage(
-    name: String,
+    specs: ImageProps,
     initializerLiteral: String,
     camelCaseForApple: Boolean
 ): TypeSpec.Builder {
     return addProperty(
-        PropertySpec.builder(name, Image)
+        PropertySpec.builder(specs.name, Image)
             .addModifiers(KModifier.ACTUAL)
             .getter(
                 FunSpec.getterBuilder()
-                    .addStatement("return $initializerLiteral", name)
+                    .addStatement("return $initializerLiteral")
                     .build()
             ).addObjCNameAnnotation(camelCaseForApple) {
-                name.snakeCaseToCamelCase(startWithLower = true)
+                specs.name.snakeCaseToCamelCase(startWithLower = true)
             }.build()
     )
 }
@@ -62,26 +62,26 @@ private fun TypeSpec.Builder.appendActualImage(
  *     get() = "image_name"
  */
 private fun TypeSpec.Builder.appendImage(
-    name: String,
+    specs: ImageProps,
     initializerLiteral: String,
     camelCaseForApple: Boolean
 ): TypeSpec.Builder {
     return addProperty(
-        PropertySpec.builder(name, Image)
+        PropertySpec.builder(specs.name, Image)
             .getter(
                 FunSpec.getterBuilder()
-                    .addStatement("return $initializerLiteral", name)
+                    .addStatement("return $initializerLiteral")
                     .build()
             ).addObjCNameAnnotation(camelCaseForApple) {
-                name.snakeCaseToCamelCase(startWithLower = true)
+                specs.name.snakeCaseToCamelCase(startWithLower = true)
             }.build()
     )
 }
 
 private fun ImageProps.initializerLiteral(platform: KotlinPlatform): String =
     when (platform) {
-        KotlinPlatform.Android -> "R.drawable.%L"
-        KotlinPlatform.Apple -> "bundle.image(%S)"
-        KotlinPlatform.Js, KotlinPlatform.Jvm -> "\"images/%L.${extension}\""
+        KotlinPlatform.Android -> "R.drawable.$name"
+        KotlinPlatform.Apple -> "bundle.image(\"$name\", \"$extension\")"
+        KotlinPlatform.Js, KotlinPlatform.Jvm -> "\"images/$name.$extension\""
         KotlinPlatform.Common -> throw IllegalArgumentException()
     }
