@@ -225,7 +225,7 @@ class ResourcesPlugin : Plugin<Project> {
         const val SETUP_PODSPEC_TASK_NAME = "libresSetupPodspecExports"
 
         private val STRINGS_EXTENSIONS = listOf("xml")
-        private val IMAGES_EXTENSIONS = listOf("png", "jpg", "jpeg", "svg")
+        private val IMAGES_EXTENSIONS = listOf("png", "jpg", "jpeg", "webp", "svg")
 
         private val BaseExtension.packageName: String?
             get() = namespace ?: run {

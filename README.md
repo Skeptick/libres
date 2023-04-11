@@ -116,7 +116,12 @@ MainRes.shared.string.simple_string
 
 ### Images
 
-The plugin supports PNG, JPG and SVG.  
+Supported formats:
+- PNG
+- JPG
+- WEBP (iOS 14+)
+- SVG (iOS 13+)
+
 For Android SVG are converted to 
 [vector drawable](https://developer.android.com/develop/ui/views/graphics/vector-drawable-resources), 
 for other platforms they copied as is.
