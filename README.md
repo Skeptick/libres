@@ -9,7 +9,7 @@ Resources generation in Kotlin Multiplatform.
 
 buildscript {
     dependencies {
-        classpath("io.github.skeptick.libres:gradle-plugin:1.1.7")
+        classpath("io.github.skeptick.libres:gradle-plugin:1.1.8")
     }
 }
 ```
@@ -119,7 +119,7 @@ MainRes.shared.string.simple_string
 Supported formats:
 - PNG
 - JPG
-- WEBP (iOS 14+)
+- WEBP (Android 4.3+, iOS 14+)
 - SVG (iOS 13+)
 
 For Android SVG are converted to 
@@ -179,7 +179,7 @@ Image size in Figma is **240x89**. Final image name is **pic_(orig)_(240).png**
 kotlin {
     commonMain {
         dependencies {
-            implementation("io.github.skeptick.libres:libres-compose:1.1.7")
+            implementation("io.github.skeptick.libres:libres-compose:1.1.8")
         }
     }
 }

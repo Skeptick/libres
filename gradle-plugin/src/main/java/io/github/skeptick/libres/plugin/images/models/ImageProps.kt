@@ -7,7 +7,7 @@ internal class ImageProps(val file: File) {
     val name: String
     val extension: String
     val targetSize: Int?
-    val isNonRepaintable: Boolean
+    val isTintable: Boolean
 
     init {
         val nameWithoutExtension = file.nameWithoutExtension
@@ -15,7 +15,7 @@ internal class ImageProps(val file: File) {
         this.name = nameWithoutExtension.substringBefore("_(").lowercase()
         this.extension = file.extension.lowercase()
         this.targetSize = if (extension != "svg") parameters.firstNotNullOfOrNull { it.groupValues[1].toIntOrNull() } else null
-        this.isNonRepaintable = parameters.any { it.groupValues[1].startsWith("orig") }
+        this.isTintable = parameters.none { it.groupValues[1].startsWith("orig") }
     }
 
     companion object {

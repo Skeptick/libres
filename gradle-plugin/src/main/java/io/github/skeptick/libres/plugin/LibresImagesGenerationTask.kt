@@ -44,7 +44,6 @@ abstract class LibresImagesGenerationTask : DefaultTask() {
             }
         }
 
-        outputSourcesDirectories.forEach { it.value.deleteFilesInDirectory() }
         inputDirectory.files
             .takeIf { files -> files.isNotEmpty() }
             ?.map { file -> ImageProps(file) }

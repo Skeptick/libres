@@ -50,9 +50,9 @@ internal fun ImageProps.toImageSetContents() =
         },
         properties = ImageSetContents.Properties(
             preserveVectorRepresentation = if (isVector) true else null,
-            templateRenderingIntent = when (isNonRepaintable) {
-                true -> ImageSetContents.VectorRenderingType.Original
-                false -> ImageSetContents.VectorRenderingType.Template
+            templateRenderingIntent = when (isTintable) {
+                true -> ImageSetContents.VectorRenderingType.Template
+                false -> ImageSetContents.VectorRenderingType.Original
             }
         )
     )

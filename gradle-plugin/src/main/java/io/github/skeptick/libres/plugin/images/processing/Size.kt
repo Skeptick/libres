@@ -13,10 +13,10 @@ internal fun calculateSize(oldSize: Size, newSideSize: Int): Size {
     }
 }
 
-internal fun Size.isLessThan(sideSize: Int): Boolean {
-    return width() < sideSize && height() < sideSize
-}
-
-internal fun Size.isEqual(sideSize: Int): Boolean {
-    return (width() == sideSize && height() <= width()) || (height() == sideSize && width() <= height())
+internal operator fun Size.compareTo(sideSize: Int): Int {
+    return when {
+        width() > sideSize || height() > sideSize -> 1
+        width() < sideSize && height() < sideSize -> -1
+        else -> 0
+    }
 }

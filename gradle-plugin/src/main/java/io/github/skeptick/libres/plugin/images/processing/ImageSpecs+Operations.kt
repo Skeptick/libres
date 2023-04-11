@@ -37,9 +37,9 @@ internal fun ImageProps.saveImage(directories: Map<KotlinPlatform, File>) {
             if (!directories.any { it.key in scale.supportedPlatforms }) continue
             val newSideSize = targetSize * scale
             when {
-                src.size().isLessThan(newSideSize) -> error("Image '$name' has too low resolution")
-                src.size().isEqual(newSideSize) -> saveOriginal(scale, directories)
-                else -> resizeAndSave(src, scale, targetSize, directories)
+                src.size() < newSideSize -> error("Image '$name' has too low resolution")
+                src.size() > newSideSize -> resizeAndSave(src, scale, targetSize, directories)
+                else -> saveOriginal(scale, directories)
             }
         }
     }

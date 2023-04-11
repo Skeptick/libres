@@ -25,7 +25,6 @@ abstract class LibresStringGenerationTask : DefaultTask() {
 
     @TaskAction
     fun apply() {
-        outputDirectory.deleteFilesInDirectory()
         inputDirectory.files
             .takeIf { files -> files.isNotEmpty() }
             ?.let { files -> parseStringResources(files, settings.baseLocaleLanguageCode) }
