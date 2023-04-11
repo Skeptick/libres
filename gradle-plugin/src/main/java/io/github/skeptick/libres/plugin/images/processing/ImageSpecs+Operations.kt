@@ -15,6 +15,7 @@ import io.github.skeptick.libres.plugin.images.models.ImageProps
 import io.github.skeptick.libres.plugin.images.models.androidName
 import java.io.File
 import java.io.FileOutputStream
+import java.io.OutputStream
 
 private val jsonWriter = jacksonObjectMapper().let {
     it.setSerializationInclusion(JsonInclude.Include.NON_NULL)
@@ -65,7 +66,7 @@ private fun ImageProps.saveOriginal(directories: Map<KotlinPlatform, File>) {
                 val targetFile = File(directory, targetFilePath(platform))
                 targetFile.parentFile.mkdirs()
                 val output = FileOutputStream(targetFile)
-                Svg2Vector.parseSvgToXml(file, output)
+                parseSvgToXml(file, output)
             }
             else -> {
                 val targetFile = File(directory, targetFilePath(platform))
@@ -114,3 +115,14 @@ private fun ImageProps.targetFilePath(platform: KotlinPlatform, scale: ImageScal
         KotlinPlatform.Jvm, KotlinPlatform.Js -> "/$name.$extension"
         KotlinPlatform.Common -> throw IllegalArgumentException()
     }
+
+/**
+ * Workaround for Svg2Vector::parseSvgToXml
+ */
+private fun parseSvgToXml(inputSvg: File, output: OutputStream) {
+    val method = Svg2Vector::class.java.declaredMethods.first { it.name == "parseSvgToXml" }
+    when (method.parameterTypes[0]) {
+        File::class.java -> method(null, inputSvg, output)
+        else -> method(null, inputSvg.toPath(), output)
+    }
+}
