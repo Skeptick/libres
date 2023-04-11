@@ -17,10 +17,5 @@ kotlin {
                 compileOnly(compose.ui)
             }
         }
-        appleMain {
-            dependencies {
-                implementation(compose.ui)
-            }
-        }
     }
 }
