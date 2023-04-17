@@ -103,7 +103,9 @@ MainRes.string.plural_string.format(5)
 ```
 Swift:
 ```swift
-MainRes.shared.string.simple_string
+MainRes.shared.string.simpleString
+MainRes.shared.string.stringWithArguments.format( name: "Nino")
+MainRes.shared.string.pluralString.format(5) // may need additional setup for some languages. See `More about localization`.
 ```
 ***
 > **Note**
