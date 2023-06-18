@@ -30,7 +30,7 @@ class ResourcesPlugin : Plugin<Project> {
     private var isKotlin = false
 
     private lateinit var pluginExtension: ResourcesPluginExtension
-    private lateinit var inputDirectory: File
+    private lateinit var inputDirectories: List<File>
     private lateinit var mainSourceSet: PluginSourceSet
     private val allSourceSets = mutableListOf<PluginSourceSet>()
     private var outputPackageName: String? = null
@@ -93,7 +93,7 @@ class ResourcesPlugin : Plugin<Project> {
 
         when {
             commonSourceSet != null -> {
-                inputDirectory = commonSourceSet.resources.sourceDirectories.first().resolveSibling("libres")
+                inputDirectories = commonSourceSet.resources.sourceDirectories.map { it.resolveSibling("libres") }
                 mainSourceSet = commonSourceSet.createKotlinSourceSet(outputDirectory, KotlinPlatform.Common)
                 allSourceSets += kotlinExtension.targets.takeKotlinSourceSet(outputDirectory, commonSourceSet)
                 if (androidExtension != null) allSourceSets += androidExtension.findAndroidSourceSet(true, outputDirectory, kotlinExtension)
@@ -101,7 +101,7 @@ class ResourcesPlugin : Plugin<Project> {
             }
             androidExtension != null -> {
                 val androidMainSourceSet = androidExtension.sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
-                inputDirectory = androidMainSourceSet.resources.srcDirs.first().resolveSibling("libres")
+                inputDirectories = androidMainSourceSet.resources.srcDirs.map { it.resolveSibling("libres") }
                 mainSourceSet = androidExtension.findAndroidSourceSet(false, outputDirectory, kotlinExtension)
                 allSourceSets += mainSourceSet
             }
@@ -109,15 +109,15 @@ class ResourcesPlugin : Plugin<Project> {
                 val target = kotlinExtension.targets.firstOrNull { it.platform != null } ?: return
                 val defaultSourceSet = target.compilations.firstOrNull { it.isMainCompilation }?.defaultSourceSet ?: return
                 mainSourceSet = defaultSourceSet.createKotlinSourceSet(outputDirectory, target.platform!!)
-                inputDirectory = defaultSourceSet.resources.sourceDirectories.first().resolveSibling("libres")
+                inputDirectories = defaultSourceSet.resources.sourceDirectories.map { it.resolveSibling("libres") }
                 allSourceSets += mainSourceSet
             }
         }
     }
 
     private fun Project.registerGeneratorsTasks() {
-        val stringsInputDirectory = File(inputDirectory, "strings")
-        val imagesInputDirectory = File(inputDirectory, "images")
+        val stringsInputDirectory = inputDirectories.map { File(it, "strings") }
+        val imagesInputDirectory = inputDirectories.map { File(it, "images") }
         val stringsOutputPackageName = listOfNotNull(outputPackageName, "strings").joinToString(".")
         val imagesOutputPackageName = listOfNotNull(outputPackageName, "images").joinToString(".")
 
@@ -130,9 +130,11 @@ class ResourcesPlugin : Plugin<Project> {
                 baseLocaleLanguageCode = pluginExtension.baseLocaleLanguageCode,
                 camelCaseForApple = pluginExtension.camelCaseNamesForAppleFramework && allSourceSets.any { it.platform == KotlinPlatform.Apple }
             )
-            task.inputDirectory = fileTree(stringsInputDirectory) { config ->
-                config.include { element ->
-                    !element.isDirectory && element.file.extension.lowercase() in STRINGS_EXTENSIONS
+            task.inputDirectories = stringsInputDirectory.map { dir ->
+                fileTree(dir) { config ->
+                    config.include { element ->
+                        !element.isDirectory && element.file.extension.lowercase() in STRINGS_EXTENSIONS
+                    }
                 }
             }
             task.outputDirectory = mainSourceSet.sourcesDir.toOutputDirectory(stringsOutputPackageName)
@@ -146,10 +148,23 @@ class ResourcesPlugin : Plugin<Project> {
                 camelCaseForApple = pluginExtension.camelCaseNamesForAppleFramework,
                 appleBundleName = project.appleBundleName
             )
-            task.inputDirectory = fileTree(imagesInputDirectory) { config ->
-                config.include { element ->
-                    !element.isDirectory && element.file.extension.lowercase() in IMAGES_EXTENSIONS
+
+            imagesInputDirectory.map { dir ->
+                fileTree(dir) { config ->
+                    config.include { element ->
+                        !element.isDirectory && element.file.extension.lowercase() in IMAGES_EXTENSIONS
+                    }
                 }
+            }
+
+            task.inputDirectory = imagesInputDirectory.map { dir ->
+                fileTree(dir) { config ->
+                    config.include { element ->
+                        !element.isDirectory && element.file.extension.lowercase() in IMAGES_EXTENSIONS
+                    }
+                }.filter { true }
+            }.reduce { fileCollectionLeft, fileCollectionRight ->
+                fileCollectionLeft + fileCollectionRight
             }
             task.outputSourcesDirectories = allSourceSets.associateBy(PluginSourceSet::platform) {
                 it.sourcesDir.toOutputDirectory(imagesOutputPackageName)

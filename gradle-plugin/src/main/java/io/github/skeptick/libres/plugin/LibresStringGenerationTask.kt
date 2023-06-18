@@ -18,17 +18,21 @@ abstract class LibresStringGenerationTask : DefaultTask() {
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    internal abstract var inputDirectory: FileCollection
+    internal abstract var inputDirectories: List<FileCollection>
 
     @get:OutputDirectory
     internal abstract var outputDirectory: File
 
     @TaskAction
     fun apply() {
-        inputDirectory.files
-            .takeIf { files -> files.isNotEmpty() }
-            ?.let { files -> parseStringResources(files, settings.baseLocaleLanguageCode) }
-            ?.takeIf { resources -> resources.getValue(settings.baseLocaleLanguageCode).isNotEmpty() }
+        inputDirectories
+            .mapNotNull { fileCollection ->
+                fileCollection.files.takeIf { files -> files.isNotEmpty() }
+            }
+            .let { listFiles ->
+                parseStringResources(listFiles, settings.baseLocaleLanguageCode)
+            }
+            .takeIf { resources -> resources.getValue(settings.baseLocaleLanguageCode).isNotEmpty() }
             ?.let { resources -> buildResources(resources) }
             ?: buildEmptyResources()
     }
