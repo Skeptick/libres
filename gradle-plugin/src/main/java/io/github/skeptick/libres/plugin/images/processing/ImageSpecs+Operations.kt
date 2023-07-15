@@ -5,14 +5,18 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.github.skeptick.libres.plugin.KotlinPlatform
+import io.github.skeptick.libres.plugin.images.models.ImageProps
+import io.github.skeptick.libres.plugin.images.models.ImageScale
+import io.github.skeptick.libres.plugin.images.models.ImageSet
+import io.github.skeptick.libres.plugin.images.models.ImageSetContents
+import io.github.skeptick.libres.plugin.images.models.ImageSetContents.Appearance
+import io.github.skeptick.libres.plugin.images.models.androidName
+import io.github.skeptick.libres.plugin.images.models.isVector
+import io.github.skeptick.libres.plugin.images.models.times
 import org.bytedeco.opencv.global.opencv_imgcodecs
 import org.bytedeco.opencv.global.opencv_imgproc
 import org.bytedeco.opencv.opencv_core.Mat
-import io.github.skeptick.libres.plugin.KotlinPlatform
-import io.github.skeptick.libres.plugin.images.models.*
-import io.github.skeptick.libres.plugin.images.models.ImageScale
-import io.github.skeptick.libres.plugin.images.models.ImageProps
-import io.github.skeptick.libres.plugin.images.models.androidName
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -25,10 +29,6 @@ private val jsonWriter = jacksonObjectMapper().let {
 }
 
 internal fun ImageProps.saveImage(directories: Map<KotlinPlatform, File>) {
-    directories[KotlinPlatform.Apple]?.let {
-        saveImageSetContents(it)
-    }
-
     if (targetSize == null) {
         saveOriginal(directories)
     } else {
@@ -50,10 +50,10 @@ internal fun ImageProps.removeImage(directories: Map<KotlinPlatform, File>) {
         when {
             platform == KotlinPlatform.Common -> continue
             platform == KotlinPlatform.Apple -> File(directory, "$name.imageset").deleteRecursively()
-            platform == KotlinPlatform.Android && targetSize != null -> ImageScale.values().forEach {
-                File(directory, targetFilePath(platform, it)).delete()
+            platform == KotlinPlatform.Android && targetSize != null -> ImageScale.values().forEach { scale ->
+                targetFile(directory, platform, scale).delete()
             }
-            else ->  File(directory, targetFilePath(platform)).delete()
+            else -> targetFile(directory, platform).delete()
         }
     }
 }
@@ -63,14 +63,18 @@ private fun ImageProps.saveOriginal(directories: Map<KotlinPlatform, File>) {
         when {
             platform == KotlinPlatform.Common -> continue
             platform == KotlinPlatform.Android && isVector -> {
-                val targetFile = File(directory, targetFilePath(platform))
-                targetFile.parentFile.mkdirs()
+                val targetFile = targetFile(directory, platform).apply {
+                    parentFile.mkdirs()
+                }
+
                 val output = FileOutputStream(targetFile)
                 parseSvgToXml(file, output)
             }
             else -> {
-                val targetFile = File(directory, targetFilePath(platform))
-                targetFile.parentFile.mkdirs()
+                val targetFile = targetFile(directory, platform).apply {
+                    parentFile.mkdirs()
+                }
+
                 file.copyTo(targetFile, overwrite = true)
             }
         }
@@ -80,8 +84,10 @@ private fun ImageProps.saveOriginal(directories: Map<KotlinPlatform, File>) {
 private fun ImageProps.saveOriginal(scale: ImageScale, directories: Map<KotlinPlatform, File>) {
     for ((platform, directory) in directories) {
         if (platform in scale.supportedPlatforms) {
-            val targetFile = File(directory, targetFilePath(platform, scale))
-            file.parentFile.mkdirs()
+            val targetFile = targetFile(directory, platform, scale).apply {
+                parentFile.mkdirs()
+            }
+
             file.copyTo(targetFile, overwrite = true)
         }
     }
@@ -94,27 +100,109 @@ private fun ImageProps.resizeAndSave(src: Mat, scale: ImageScale, size: Int, dir
 
     for ((platform, directory) in directories) {
         if (platform in scale.supportedPlatforms) {
-            val targetPath = directory.absolutePath + targetFilePath(platform, scale)
-            File(targetPath).parentFile.mkdirs()
-            opencv_imgcodecs.imwrite(targetPath, destinationImage)
+            val targetFile = targetFile(directory, platform, scale).apply {
+                parentFile.mkdirs()
+            }
+
+            opencv_imgcodecs.imwrite(targetFile.absolutePath, destinationImage)
         }
     }
 }
 
-private fun ImageProps.saveImageSetContents(directory: File) {
-    val text = jsonWriter.writeValueAsString(toImageSetContents())
+internal fun ImageSet.saveImageSet(directories: Map<KotlinPlatform, File>) {
+    for ((platform, directory) in directories) {
+        when (platform) {
+            KotlinPlatform.Apple -> saveImageSetContents(directory)
+            KotlinPlatform.Android, KotlinPlatform.Common, KotlinPlatform.Jvm, KotlinPlatform.Js -> Unit
+        }
+    }
+}
+
+private fun ImageSet.saveImageSetContents(directory: File) {
+    val text = jsonWriter.writeValueAsString(toImageSetContents(directory))
     val file = File(directory, "$name.imageset/Contents.json")
     file.parentFile.mkdirs()
     file.writeText(text)
 }
 
+private fun ImageSet.toImageSetContents(directory: File) =
+    ImageSetContents(
+        images = images.map { image ->
+            val appearances = image.appearances()
+            when (image.targetSize) {
+                null -> listOf(
+                    ImageSetContents.Image(
+                        filename = image.targetFile(directory, KotlinPlatform.Apple).name,
+                        appearances = appearances,
+                    )
+                )
+
+                else -> ImageSetContents.ImageScale.values().map { scale ->
+                    ImageSetContents.Image(
+                        filename = image.targetFile(directory, KotlinPlatform.Apple, scale.toImageScale()).name,
+                        scale = scale,
+                        appearances = appearances,
+                    )
+                }
+            }
+        }.flatten(),
+        properties = ImageSetContents.Properties(
+            preserveVectorRepresentation = if (isVector) true else null,
+            templateRenderingIntent = when (isTintable) {
+                true -> ImageSetContents.VectorRenderingType.Template
+                false -> ImageSetContents.VectorRenderingType.Original
+            }
+        )
+    )
+
+private fun ImageSetContents.ImageScale.toImageScale() =
+    when (this) {
+        ImageSetContents.ImageScale.x1 -> ImageScale.x1
+        ImageSetContents.ImageScale.x2 -> ImageScale.x2
+        ImageSetContents.ImageScale.x3 -> ImageScale.x3
+    }
+
+private fun ImageProps.appearances(): List<Appearance>? =
+    listOfNotNull(
+        if (isNightMode) Appearance.Luminosity.Dark else null,
+    ).takeIf(List<*>::isNotEmpty)
+
+private fun ImageProps.targetFile(
+    directory: File,
+    platform: KotlinPlatform,
+    scale: ImageScale? = null,
+) = File(directory, targetFilePath(platform, scale))
+
 private fun ImageProps.targetFilePath(platform: KotlinPlatform, scale: ImageScale? = null): String =
     when (platform) {
-        KotlinPlatform.Android -> "/drawable-${scale?.androidName ?: "nodpi"}/$name.${if (isVector) "xml" else extension}"
-        KotlinPlatform.Apple -> "/$name.imageset/$name${if (scale != null) "_${scale.name}" else ""}.$extension"
+        KotlinPlatform.Android -> androidTargetFilePath(scale)
+        KotlinPlatform.Apple -> appleTargetFilePath(scale)
         KotlinPlatform.Jvm, KotlinPlatform.Js -> "/$name.$extension"
-        KotlinPlatform.Common -> throw IllegalArgumentException()
+        KotlinPlatform.Common -> error("Can not generate targetFilePath for platform '$platform'.")
     }
+
+private fun ImageProps.androidTargetFilePath(scale: ImageScale?): String {
+    val folderName = listOfNotNull(
+        "drawable",
+        if (isNightMode) "night" else null,
+        scale?.androidName ?: "nodpi",
+    ).joinToString("-")
+    val fileName = name
+    val extension = if (isVector) "xml" else extension
+
+    return "/$folderName/$fileName.$extension"
+}
+
+private fun ImageProps.appleTargetFilePath(scale: ImageScale?): String {
+    val folderName = "$name.imageset"
+    val fileName = listOfNotNull(
+        name,
+        scale?.name,
+        if (isNightMode) "night" else null,
+    ).joinToString("_")
+
+    return "/$folderName/$fileName.$extension"
+}
 
 /**
  * Workaround for Svg2Vector::parseSvgToXml

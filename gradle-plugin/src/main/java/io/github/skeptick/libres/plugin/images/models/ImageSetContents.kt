@@ -23,8 +23,23 @@ internal data class ImageSetContents(
     data class Image(
         val filename: String,
         val scale: ImageScale? = null,
-        val idiom: String = "universal"
+        val idiom: String = "universal",
+        val appearances: List<Appearance>? = null,
     )
+
+    sealed interface Appearance {
+        val appearance: String
+        val value: String
+
+        sealed interface Luminosity : Appearance {
+            override val appearance: String
+                get() = "luminosity"
+
+            object Dark : Luminosity {
+                override val value: String = "dark"
+            }
+        }
+    }
 
     data class Info(
         val author: String = "xcode",
@@ -35,24 +50,4 @@ internal data class ImageSetContents(
         @JsonProperty("preserves-vector-representation") val preserveVectorRepresentation: Boolean?,
         @JsonProperty("template-rendering-intent") val templateRenderingIntent: VectorRenderingType
     )
-
 }
-
-internal fun ImageProps.toImageSetContents() =
-    ImageSetContents(
-        images = when (targetSize) {
-            null -> listOf(
-                ImageSetContents.Image(filename = "$name.$extension")
-            )
-            else -> ImageSetContents.ImageScale.values().map {
-                ImageSetContents.Image(filename = "${this.name}_${it.name}.$extension", scale = it)
-            }
-        },
-        properties = ImageSetContents.Properties(
-            preserveVectorRepresentation = if (isVector) true else null,
-            templateRenderingIntent = when (isTintable) {
-                true -> ImageSetContents.VectorRenderingType.Template
-                false -> ImageSetContents.VectorRenderingType.Original
-            }
-        )
-    )

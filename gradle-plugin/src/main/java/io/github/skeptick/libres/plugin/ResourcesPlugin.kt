@@ -118,6 +118,7 @@ class ResourcesPlugin : Plugin<Project> {
     private fun Project.registerGeneratorsTasks() {
         val stringsInputDirectory = File(inputDirectory, "strings")
         val imagesInputDirectory = File(inputDirectory, "images")
+        val nightImagesInputDirectory = File(inputDirectory, "images-night")
         val stringsOutputPackageName = listOfNotNull(outputPackageName, "strings").joinToString(".")
         val imagesOutputPackageName = listOfNotNull(outputPackageName, "images").joinToString(".")
 
@@ -147,6 +148,11 @@ class ResourcesPlugin : Plugin<Project> {
                 appleBundleName = project.appleBundleName
             )
             task.inputDirectory = fileTree(imagesInputDirectory) { config ->
+                config.include { element ->
+                    !element.isDirectory && element.file.extension.lowercase() in IMAGES_EXTENSIONS
+                }
+            }
+            task.nightInputDirectory = fileTree(nightImagesInputDirectory) { config ->
                 config.include { element ->
                     !element.isDirectory && element.file.extension.lowercase() in IMAGES_EXTENSIONS
                 }
@@ -248,5 +254,4 @@ class ResourcesPlugin : Plugin<Project> {
             File(absolutePath, packageName.replace('.', File.separatorChar))
 
     }
-
 }
