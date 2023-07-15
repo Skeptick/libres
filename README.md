@@ -61,9 +61,6 @@ Multiplatform:
 │       ├── images
 │       │   ├── vector_image.svg
 │       │   └── raster_image.png
-│       ├── images-night
-│       │   ├── vector_image.svg
-│       │   └── raster_image.png
 │       └── strings
 │           ├── strings_en.xml
 │           └── strings_ru.xml
@@ -75,9 +72,6 @@ Android or JVM:
 │   ├── java
 │   └── libres
 │       ├── images
-│       │   ├── vector_image.svg
-│       │   └── raster_image.png
-│       ├── images-night
 │       │   ├── vector_image.svg
 │       │   └── raster_image.png
 │       └── strings
@@ -147,17 +141,27 @@ Recommended for multicolor images.
 > - For iOS images are generated from 1x to 3x (where 1x is 1:1 in pixels to the specified size)
 > - For JVM and JS a single image of the specified size is generated.
 
+> **night**
+>
+> Night/Dark Mode images are supported for Android and iOS by adding the `(night)` modifier. The filename and type of 
+> the image must match the corresponding day/light version without the `(night)` modifier.
+> 
+> - For Android this creates night images in `drawable-night-nodpi`.
+> - For iOS this creates a `"appearances" : [ { "appearance" : "luminosity",  "value" : "dark" } ]` entry in the `imageset`.
+
 Filename examples:
 ```
 some_hd_image_(100).jpg
 app_logo_(orig).svg
 my_colorful_bitmap_(orig)_(150).png
+image_with_night_support_(night).png
 ```
 Kotlin:
 ```kotlin
 MainRes.image.some_hd_image
 MainRes.image.app_logo
 MainRes.image.my_colorful_bitmap
+MainRes.image.image_with_night_support
 ```
 Swift:
 ```swift
@@ -176,15 +180,6 @@ To obtain bundle of png images with different resolutions (e.g. mdpi - xxxhdpi o
 Sample:
 Image size in Figma is **240x89**. Final image name is **pic_(orig)_(240).png**
 </details>
-
-#### Night/Dark Mode Images
-Night/Dark Mode images are supported for Android and iOS by placing a night version of the image into the 
-`libres/images-night/` folder.
-
-The filename and type of the image must match the corresponding day/light version in `libres/images/`.
-
-- For Android this creates night images in `drawable-night-nodpi`.
-- For iOS this creates a `"appearances" : [ { "appearance" : "luminosity",  "value" : "dark" } ]` entry in the `imageset`.
 
 ## Jetpack Compose
 

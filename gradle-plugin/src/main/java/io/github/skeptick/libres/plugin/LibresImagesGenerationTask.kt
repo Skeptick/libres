@@ -8,8 +8,8 @@ import io.github.skeptick.libres.plugin.images.declarations.ImagesObjectFile
 import io.github.skeptick.libres.plugin.images.models.ImageProps
 import io.github.skeptick.libres.plugin.images.models.ImageSet
 import io.github.skeptick.libres.plugin.images.processing.removeImage
-import io.github.skeptick.libres.plugin.images.processing.saveImageSet
 import io.github.skeptick.libres.plugin.images.processing.saveImage
+import io.github.skeptick.libres.plugin.images.processing.saveImageSet
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.*
@@ -29,11 +29,6 @@ abstract class LibresImagesGenerationTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     internal abstract var inputDirectory: FileCollection
 
-    @get:Incremental
-    @get:InputFiles
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    internal abstract var nightInputDirectory: FileCollection
-
     @get:OutputDirectories
     internal abstract var outputSourcesDirectories: Map<KotlinPlatform, File>
 
@@ -43,10 +38,7 @@ abstract class LibresImagesGenerationTask : DefaultTask() {
     @TaskAction
     fun apply(inputChanges: InputChanges) {
         // Update images for changed files
-        sequenceOf(
-            inputChanges.getFileChanges(inputDirectory),
-            inputChanges.getFileChanges(nightInputDirectory),
-        ).flatten()
+        inputChanges.getFileChanges(inputDirectory)
             .forEach { change ->
                 val image = ImageProps(change.file)
 
@@ -57,11 +49,8 @@ abstract class LibresImagesGenerationTask : DefaultTask() {
                 }
             }
 
-        // Generate image catalog
-        sequenceOf(
-            inputDirectory.files,
-            nightInputDirectory.files,
-        ).flatten()
+        // Generate image sets
+        inputDirectory.files
             .map(::ImageProps)
             .groupBy(ImageProps::name)
             .map { (name, files) -> ImageSet(name, files) }
@@ -70,13 +59,10 @@ abstract class LibresImagesGenerationTask : DefaultTask() {
             }
 
         // Generate code
-        sequenceOf(
-            inputDirectory.files,
-            nightInputDirectory.files,
-        ).flatten().toSet()
+        inputDirectory.files
             .takeIf { files -> files.isNotEmpty() }
-            ?.distinctBy(File::nameWithoutExtension)
             ?.map(::ImageProps)
+            ?.distinctBy(ImageProps::name)
             ?.let(::buildImages)
             ?: buildEmptyImages()
     }

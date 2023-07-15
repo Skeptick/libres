@@ -11,7 +11,6 @@ internal class ImageProps(val file: File) {
     val isNightMode: Boolean
 
     init {
-        val directoryName = file.parentFile.name
         val nameWithoutExtension = file.nameWithoutExtension
         val parameters = ParametersRegex.findAll(nameWithoutExtension).toList()
 
@@ -19,7 +18,7 @@ internal class ImageProps(val file: File) {
         this.extension = file.extension.lowercase()
         this.targetSize = if (!isVector) parameters.firstNotNullOfOrNull { it.groupValues[1].toIntOrNull() } else null
         this.isTintable = parameters.none { it.groupValues[1].startsWith("orig") }
-        this.isNightMode = directoryName.endsWith("-night")
+        this.isNightMode = parameters.any { it.groupValues[1] == "night" }
     }
 
     companion object {
