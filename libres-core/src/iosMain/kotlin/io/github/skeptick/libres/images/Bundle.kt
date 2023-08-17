@@ -5,7 +5,7 @@ import platform.UIKit.UIImage
 import platform.UIKit.accessibilityValue
 
 fun NSBundle.Companion.bundleWithName(name: String): NSBundle {
-    val url = mainBundle.URLForResource(name = name, withExtension = "bundle") ?: error("$name.bundle not found")
+    val url = mainBundle.URLForResource(name = name, withExtension = "bundle", subdirectory = "libres-bundles") ?: error("$name.bundle not found")
     return NSBundle.bundleWithURL(url = url) ?: error("Cannot access $name.bundle")
 }
 
