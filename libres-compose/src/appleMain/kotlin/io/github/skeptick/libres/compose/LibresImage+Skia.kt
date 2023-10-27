@@ -31,7 +31,7 @@ internal fun LibresImage.toSkiaImage(size: IntSize = intSize): SkiaImage = memSc
         bitsPerComponent = bytesPerComponent,
         bytesPerRow = bytesPerRow,
         space = CGColorSpaceCreateDeviceRGB(),
-        bitmapInfo = CGImageGetAlphaInfo(imageRef).value
+        bitmapInfo = CGImageGetBitmapInfo(imageRef)
     )
     CGContextDrawImage(context, size.toCGRect(), imageRef)
     CGContextRelease(context)
