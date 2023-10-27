@@ -9,7 +9,7 @@ Resources generation in Kotlin Multiplatform.
 
 buildscript {
     dependencies {
-        classpath("io.github.skeptick.libres:gradle-plugin:1.2.0-beta01")
+        classpath("io.github.skeptick.libres:gradle-plugin:1.2.0")
     }
 }
 ```
@@ -37,7 +37,7 @@ libres {
 kotlin {
     commonMain {
         dependencies {
-            implementation("io.github.skeptick.libres:libres-compose:1.2.0-beta01")
+            implementation("io.github.skeptick.libres:libres-compose:1.2.0")
         }
     }
 }
