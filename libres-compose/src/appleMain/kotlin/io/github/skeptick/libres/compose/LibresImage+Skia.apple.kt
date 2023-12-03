@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package io.github.skeptick.libres.compose
 
 import androidx.compose.ui.unit.IntSize

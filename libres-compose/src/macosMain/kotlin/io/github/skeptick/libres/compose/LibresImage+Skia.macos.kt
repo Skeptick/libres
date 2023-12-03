@@ -1,7 +1,10 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package io.github.skeptick.libres.compose
 
 import androidx.compose.ui.unit.IntSize
 import io.github.skeptick.libres.images.Image
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.MemScope
 import platform.AppKit.NSImageRep
 import platform.CoreGraphics.CGImageRef

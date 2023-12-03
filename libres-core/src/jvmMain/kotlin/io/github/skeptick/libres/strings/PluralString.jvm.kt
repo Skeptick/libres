@@ -1,11 +1,7 @@
 package io.github.skeptick.libres.strings
 
 import com.ibm.icu.text.PluralRules
-import java.util.*
-
-actual fun getPlatformLanguageCode(): String {
-    return Locale.getDefault().language
-}
+import java.util.Locale
 
 actual fun getPluralizedString(forms: PluralForms, languageCode: String, number: Int): String {
     val rules = PluralRules.forLocale(Locale(languageCode))
