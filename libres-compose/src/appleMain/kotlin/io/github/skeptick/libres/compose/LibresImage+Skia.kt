@@ -31,7 +31,7 @@ internal fun LibresImage.toSkiaImage(size: IntSize = intSize): SkiaImage = memSc
         bitsPerComponent = bytesPerComponent,
         bytesPerRow = bytesPerRow,
         space = CGColorSpaceCreateDeviceRGB(),
-        bitmapInfo = CGImageGetBitmapInfo(imageRef)
+        bitmapInfo = CGImageAlphaInfo.kCGImageAlphaPremultipliedLast.value
     )
     CGContextDrawImage(context, size.toCGRect(), imageRef)
     CGContextRelease(context)
@@ -41,23 +41,11 @@ internal fun LibresImage.toSkiaImage(size: IntSize = intSize): SkiaImage = memSc
             width = size.width,
             height = size.height,
             colorType = ColorType.RGBA_8888,
-            alphaType = imageRef.skiaAlphaType
+            alphaType = ColorAlphaType.PREMUL
         ),
         bytes = rawData.readBytes(dataLength),
         rowBytes = bytesPerRow.toInt()
     )
 }
-
-internal val CGImageRef.skiaAlphaType: ColorAlphaType
-    get() = when (CGImageGetAlphaInfo(this)) {
-        CGImageAlphaInfo.kCGImageAlphaPremultipliedFirst,
-        CGImageAlphaInfo.kCGImageAlphaPremultipliedLast -> ColorAlphaType.PREMUL
-        CGImageAlphaInfo.kCGImageAlphaFirst,
-        CGImageAlphaInfo.kCGImageAlphaLast -> ColorAlphaType.UNPREMUL
-        CGImageAlphaInfo.kCGImageAlphaNone,
-        CGImageAlphaInfo.kCGImageAlphaNoneSkipFirst,
-        CGImageAlphaInfo.kCGImageAlphaNoneSkipLast -> ColorAlphaType.OPAQUE
-        else -> ColorAlphaType.UNKNOWN
-    }
 
 internal fun IntSize.toCGRect() = CGRectMake(0.0, 0.0, width.toDouble(), height.toDouble())
