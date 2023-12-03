@@ -88,7 +88,7 @@ internal val KotlinTarget.platform: KotlinPlatform?
         is KotlinJvmTarget, is KotlinWithJavaTarget<*, *> -> KotlinPlatform.Jvm
         is KotlinJsIrTarget -> KotlinPlatform.Js
         is KotlinNativeTarget -> when (konanTarget.family) {
-            Family.IOS, Family.OSX -> KotlinPlatform.Apple
+            Family.IOS, Family.OSX, Family.TVOS -> KotlinPlatform.Apple
             else -> null
         }
         else -> null

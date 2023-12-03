@@ -9,6 +9,10 @@ android {
 }
 
 kotlin {
+    tvosX64()
+    tvosSimulatorArm64()
+    tvosArm64()
+
     applyDefaultHierarchyTemplate()
 
     sourceSets {
@@ -29,6 +33,12 @@ kotlin {
             dependsOn(commonMain.get())
             appleMain.get().dependsOn(this)
             jsMain.get().dependsOn(this)
+        }
+
+        val uikitMain by creating {
+            dependsOn(appleMain.get())
+            iosMain.get().dependsOn(this)
+            tvosMain.get().dependsOn(this)
         }
     }
 }
