@@ -42,7 +42,6 @@ internal fun KotlinSourceSet.createKotlinSourceSet(
     return SourceSet(rootDir = rootDir, sourcesDir = sourcesDirectory, resourcesDir = resourcesDirectory, platform)
 }
 
-@Suppress("UnstableApiUsage")
 internal fun KotlinSourceSet.createAndroidSourceSet(
     outputDirectory: File,
     androidMainSourceSet: AndroidSourceSet

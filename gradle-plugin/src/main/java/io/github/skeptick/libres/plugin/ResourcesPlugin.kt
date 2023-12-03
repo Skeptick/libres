@@ -121,7 +121,6 @@ class ResourcesPlugin : Plugin<Project> {
         }
     }
 
-    @Suppress("UnstableApiUsage")
     private fun Project.registerGeneratorsTasks() {
         val stringsInputDirectory = File(inputDirectory, "strings")
         val imagesInputDirectory = File(inputDirectory, "images")
