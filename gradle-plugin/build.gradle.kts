@@ -1,12 +1,13 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+
 plugins {
     kotlin("jvm")
     id("java-gradle-plugin")
     id("com.vanniktech.maven.publish")
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+kotlin {
+    jvmToolchain(11)
 }
 
 dependencies {
@@ -55,7 +56,6 @@ tasks.register("libresVersion") {
 }
 
 afterEvaluate {
-    tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinCompile::class.java).configureEach {
-        dependsOn("libresVersion")
-    }
+    tasks.withType(Jar::class.java).configureEach { dependsOn("libresVersion") }
+    tasks.withType(KotlinCompile::class.java).configureEach { dependsOn("libresVersion") }
 }

@@ -90,7 +90,8 @@ class ResourcesPlugin : Plugin<Project> {
     }
 
     private fun Project.fetchSourceSets() {
-        val outputDirectory = File(project.buildDir, "generated/libres")
+        val buildDir = layout.buildDirectory.asFile.get()
+        val outputDirectory = File(buildDir, "generated/libres")
         val kotlinExtension = project.extensions.getByType(KotlinProjectExtension::class.java)
         val commonSourceSet = kotlinExtension.sourceSets.findByName(KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME)
         val androidExtension = project.extensions.findByName("android") as BaseExtension?

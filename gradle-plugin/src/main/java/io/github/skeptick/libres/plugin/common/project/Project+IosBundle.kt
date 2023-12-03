@@ -10,17 +10,17 @@ import kotlin.io.path.pathString
 internal const val appleBundlesDirectory = "generated/libres/apple/libres-bundles"
 
 internal fun Project.appendAppleBundles(currentResources: String): String {
-    File(buildDir, appleBundlesDirectory).mkdirs()
-    val path = "'${buildDir.relativeTo(projectDir).path}/$appleBundlesDirectory'"
+    File(buildDirectory, appleBundlesDirectory).mkdirs()
+    val path = "'${buildDirectory.relativeTo(projectDir).path}/$appleBundlesDirectory'"
     if (currentResources.isBlank() || currentResources.trim().matches(Regex("^\\[\\s*]$"))) return "[$path]"
     val existPaths = currentResources.substringAfter('[').substringBeforeLast(']')
     return "[$existPaths, $path]"
 }
 
 internal fun createBundlesSymLinks(rootProject: Project, exportedProjects: List<Project>) {
-    val rootBundlesDir = Path(rootProject.buildDir.absolutePath, appleBundlesDirectory)
+    val rootBundlesDir = Path(rootProject.buildDirectory.absolutePath, appleBundlesDirectory)
     val rootBundleName = rootProject.appleBundleName
-    val rootBundle = Path(rootProject.buildDir.absolutePath, appleBundlesDirectory, "${rootBundleName}.bundle")
+    val rootBundle = Path(rootProject.buildDirectory.absolutePath, appleBundlesDirectory, "${rootBundleName}.bundle")
     if (!Files.exists(rootBundle)) Files.createDirectories(rootBundle)
     exportedProjects.forEach { rootBundlesDir.addSymlinkToBundle(it) }
 }
@@ -32,8 +32,10 @@ internal val Project.appleBundleName: String
 
 private fun Path.addSymlinkToBundle(project: Project) {
     val bundleName = project.appleBundleName
-    val target = Path(project.buildDir.absolutePath, appleBundlesDirectory, "${bundleName}.bundle")
+    val target = Path(project.buildDirectory.absolutePath, appleBundlesDirectory, "${bundleName}.bundle")
     val link = Path(pathString, "${bundleName}.bundle")
     if (!Files.exists(target)) Files.createDirectories(target)
     if (!Files.exists(link)) Files.createSymbolicLink(link, target)
 }
+
+private val Project.buildDirectory: File get() = layout.buildDirectory.asFile.get()
