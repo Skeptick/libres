@@ -9,11 +9,13 @@ android {
 }
 
 kotlin {
-    sourceSets {
-        val commonMain by getting
-        val appleMain by getting
-        val jsMain by getting
+    tvosX64()
+    tvosSimulatorArm64()
+    tvosArm64()
 
+    applyDefaultHierarchyTemplate()
+
+    sourceSets {
         androidMain {
             dependencies {
                 implementation(libs.androidx.core)
@@ -28,9 +30,15 @@ kotlin {
         }
 
         val appleAndJsMain by creating {
-            dependsOn(commonMain)
-            appleMain.dependsOn(this)
-            jsMain.dependsOn(this)
+            dependsOn(commonMain.get())
+            appleMain.get().dependsOn(this)
+            jsMain.get().dependsOn(this)
+        }
+
+        val uikitMain by creating {
+            dependsOn(appleMain.get())
+            iosMain.get().dependsOn(this)
+            tvosMain.get().dependsOn(this)
         }
     }
 }

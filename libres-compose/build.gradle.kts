@@ -14,7 +14,7 @@ kotlin {
         commonMain {
             dependencies {
                 api(projects.libresCore)
-                compileOnly(compose.ui)
+                implementation(compose.ui)
             }
         }
     }
