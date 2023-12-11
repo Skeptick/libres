@@ -50,6 +50,24 @@ internal fun TypeSpec.Builder.addTextResourceToLocalizedObject(
 }
 
 /*
+ * fun string_name(locale: String): ClassName {
+ *     return locales[locale]?.string_name ?: baseLocale.string_name
+ * }
+ */
+internal fun TypeSpec.Builder.addTextResourceFunctionToStringsObject(
+    name: String,
+    type: ClassName
+): TypeSpec.Builder {
+    return addFunction(
+        FunSpec.builder(name).apply {
+            addParameter("locale", String::class)
+            addCode("return locales[locale]?.$name ?: baseLocale.$name")
+            returns(type)
+        }.build()
+    )
+}
+
+/*
  * val string_name: ClassName
  *    get() = locales[getCurrentLanguageCode()]?.string_name ?: baseLocale.string_name
  */
@@ -62,7 +80,7 @@ internal fun TypeSpec.Builder.addTextResourceToStringsObject(
         PropertySpec.builder(name, type)
             .getter(
                 FunSpec.getterBuilder()
-                    .addStatement("return locales[${::getCurrentLanguageCode.name}()]?.$name ?: baseLocale.$name")
+                    .addStatement("return $name(${::getCurrentLanguageCode.name}())")
                     .build()
             ).addObjCNameAnnotation(camelCaseForApple) {
                 name.snakeCaseToCamelCase(startWithLower = true)

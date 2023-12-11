@@ -38,6 +38,7 @@ internal class StringTypeSpecsBuilder(
         baseResource.appendLocalizedResources(localizedResources, type)
         stringsInterface.addTextResourceToInterface(resourceName, type)
         baseLocalizedObject.addTextResourceToLocalizedObject(resourceName, formattedResource, type, baseLanguageCode)
+        stringObject.addTextResourceFunctionToStringsObject(resourceName, type)
         stringObject.addTextResourceToStringsObject(resourceName, type, camelCaseForApple)
         if (generateNamedArguments && baseParameters.isNotEmpty()) customClasses += CustomFormattedTextResourceClass(type, baseResource)
     }
