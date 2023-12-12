@@ -1,16 +1,16 @@
 [versions]
-plugin-android = "7.3.0"
-plugin-publish-maven = "0.22.0"
-plugin-multiplatform-compose = "1.3.1"
+plugin-android = "8.1.2"
+plugin-publish-maven = "0.25.3"
+plugin-multiplatform-compose = "1.5.10"
 
-kotlin = "1.8.10"
-androidx-core = "1.9.0"
+kotlin = "1.9.20"
+androidx-core = "1.12.0"
 robovm = "1.0.0"
-icu4j = "70.1"
-jackson = "2.14.0"
-kotlinpoet = "1.12.0"
-javacv = "1.5.7"
-android-sdk-tools = "30.3.1"
+icu4j = "74.1"
+jackson = "2.16.0"
+kotlinpoet = "1.15.2"
+javacv = "1.5.9"
+android-sdk-tools = "31.2.0"
 
 junit = "4.13.2"
 

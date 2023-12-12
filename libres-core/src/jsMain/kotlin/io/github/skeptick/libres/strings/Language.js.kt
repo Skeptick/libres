@@ -10,9 +10,4 @@ actual fun getPlatformLanguageCode(): String {
     }
 }
 
-actual fun getPluralizedString(forms: PluralForms, languageCode: String, number: Int): String {
-    val formName = PluralRules[languageCode].getForm(number).formName
-    return forms[formName] ?: error("Plural form '$formName' not provided")
-}
-
 private inline val String.languageCode get() = if (length == 2) this else take(2)

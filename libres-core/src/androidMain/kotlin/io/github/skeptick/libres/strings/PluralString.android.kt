@@ -2,13 +2,8 @@ package io.github.skeptick.libres.strings
 
 import android.icu.text.PluralRules
 import android.os.Build
-import androidx.core.os.LocaleListCompat
 import libcore.icu.NativePluralRules
-import java.util.*
-
-actual fun getPlatformLanguageCode(): String {
-    return LocaleListCompat.getDefault()[0]?.language ?: "undefined"
-}
+import java.util.Locale
 
 actual fun getPluralizedString(forms: PluralForms, languageCode: String, number: Int): String {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

@@ -68,10 +68,10 @@ internal fun EmptyStringObject(name: String): TypeSpec.Builder {
     return TypeSpec.objectBuilder("${name}Strings")
 }
 
-internal fun CustomFormattedTextResourceClass(resource: TextResource): TypeSpec.Builder {
+internal fun CustomFormattedTextResourceClass(type: ClassName, resource: TextResource): TypeSpec.Builder {
     return when (resource) {
-        is StringResource -> CustomFormattedStringClass(resource)
-        is PluralsResource -> CustomFormattedPluralStringClass(resource)
+        is StringResource -> CustomFormattedStringClass(type, resource)
+        is PluralsResource -> CustomFormattedPluralStringClass(type, resource)
     }
 }
 
@@ -82,9 +82,9 @@ internal fun CustomFormattedTextResourceClass(resource: TextResource): TypeSpec.
  *     }
  * }
  */
-private fun CustomFormattedStringClass(resource: StringResource): TypeSpec.Builder {
+private fun CustomFormattedStringClass(type: ClassName, resource: StringResource): TypeSpec.Builder {
     val parameters = resource.parameters.map { it.snakeCaseToCamelCase(startWithLower = true) }.toSet()
-    return TypeSpec.classBuilder(resource.name.snakeCaseToCamelCase(startWithLower = false))
+    return TypeSpec.classBuilder(type.simpleName)
         .primaryConstructor(
             FunSpec.constructorBuilder().addParameter("value", String::class).build()
         ).addProperty(
@@ -105,9 +105,9 @@ private fun CustomFormattedStringClass(resource: StringResource): TypeSpec.Build
  *     }
  * }
  */
-private fun CustomFormattedPluralStringClass(resource: PluralsResource): TypeSpec.Builder {
+private fun CustomFormattedPluralStringClass(type: ClassName, resource: PluralsResource): TypeSpec.Builder {
     val parameters = resource.parameters.map { it.snakeCaseToCamelCase(startWithLower = true) }.toSet()
-    return TypeSpec.classBuilder(resource.name.snakeCaseToCamelCase(startWithLower = false))
+    return TypeSpec.classBuilder(type.simpleName)
         .primaryConstructor(
             FunSpec.constructorBuilder()
                 .addParameter("forms", PluralForms::class.asClassName())

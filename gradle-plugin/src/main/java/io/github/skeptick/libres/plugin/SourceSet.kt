@@ -23,6 +23,7 @@ enum class KotlinPlatform {
 }
 
 internal class SourceSet(
+    val rootDir: File,
     val sourcesDir: File,
     val resourcesDir: File,
     val platform: KotlinPlatform
@@ -32,32 +33,33 @@ internal fun KotlinSourceSet.createKotlinSourceSet(
     outputDirectory: File,
     platform: KotlinPlatform
 ): SourceSet {
-    val sourcesDirectory = File(outputDirectory, "${platform.name.lowercase()}/src")
-    val resourcesDirectory = File(outputDirectory, "${platform.name.lowercase()}/resources")
+    val rootDir = File(outputDirectory, platform.name.lowercase())
+    val sourcesDirectory = File(rootDir, "src")
+    val resourcesDirectory = File(rootDir, "resources")
     kotlin.srcDir(sourcesDirectory)
-    resources.srcDir(resourcesDirectory)
-    return SourceSet(sourcesDirectory, resourcesDirectory, platform)
+    // don't add to apples source sets, otherwise compose plugin duplicates them
+    if (platform != KotlinPlatform.Apple) resources.srcDir(resourcesDirectory)
+    return SourceSet(rootDir = rootDir, sourcesDir = sourcesDirectory, resourcesDir = resourcesDirectory, platform)
 }
 
-@Suppress("UnstableApiUsage")
 internal fun KotlinSourceSet.createAndroidSourceSet(
     outputDirectory: File,
     androidMainSourceSet: AndroidSourceSet
 ): SourceSet {
-    val sourcesDirectory = File(outputDirectory, "android/src")
-    val resourcesDirectory = File(outputDirectory, "android/resources")
+    val rootDir = File(outputDirectory, "android")
+    val sourcesDirectory = File(rootDir, "src")
+    val resourcesDirectory = File(rootDir, "resources")
     kotlin.srcDir(sourcesDirectory)
     androidMainSourceSet.kotlin.srcDir(sourcesDirectory)
     androidMainSourceSet.res.srcDir(resourcesDirectory)
-    return SourceSet(sourcesDirectory, resourcesDirectory, KotlinPlatform.Android)
+    return SourceSet(rootDir = rootDir, sourcesDir = sourcesDirectory, resourcesDir = resourcesDirectory, KotlinPlatform.Android)
 }
 
 internal fun List<KotlinTarget>.takeKotlinSourceSet(
-    outputDirectory: File,
-    common: KotlinSourceSet
+    outputDirectory: File
 ): List<SourceSet> = mapNotNull { target ->
     val platform = target.platform ?: return@mapNotNull null
-    val compilation = target.compilations.firstOrNull { it.isMainCompilation && it.kotlinSourceSets.isDependsOn(common) }
+    val compilation = target.compilations.firstOrNull { it.isMainCompilation }
     compilation?.defaultSourceSet?.createKotlinSourceSet(outputDirectory, platform)
 }
 
@@ -86,7 +88,7 @@ internal val KotlinTarget.platform: KotlinPlatform?
         is KotlinJvmTarget, is KotlinWithJavaTarget<*, *> -> KotlinPlatform.Jvm
         is KotlinJsIrTarget -> KotlinPlatform.Js
         is KotlinNativeTarget -> when (konanTarget.family) {
-            Family.IOS, Family.OSX -> KotlinPlatform.Apple
+            Family.IOS, Family.OSX, Family.TVOS -> KotlinPlatform.Apple
             else -> null
         }
         else -> null
@@ -101,7 +103,3 @@ internal val KotlinProjectExtension.targets: List<KotlinTarget>
 
 internal val KotlinCompilation<*>.isMainCompilation: Boolean
     get() = name == "main"
-
-private fun Iterable<KotlinSourceSet>.isDependsOn(sourceSet: KotlinSourceSet): Boolean = any {
-    it.dependsOn.contains(sourceSet) || it.dependsOn.isDependsOn(sourceSet)
-}

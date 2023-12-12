@@ -97,7 +97,7 @@ private fun TypeSpec.Builder.appendAppleBundleProperty(bundleName: String): Type
     return addProperty(
         PropertySpec.builder("bundle", NSBundle)
             .addModifiers(KModifier.PRIVATE)
-            .initializer("NSBundle.bundleWithName(%S)", bundleName)
+            .delegate("lazy { NSBundle.bundleWithName(%S) }", bundleName)
             .build()
     )
 }
