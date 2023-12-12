@@ -185,7 +185,7 @@ private fun ImageProps.androidTargetFilePath(scale: ImageScale?): String {
     val folderName = listOfNotNull(
         "drawable",
         if (isNightMode) "night" else null,
-        scale?.androidName ?: "nodpi",
+        scale?.androidName ?: if (isVector) "anydpi" else "nodpi",
     ).joinToString("-")
     val fileName = name
     val extension = if (isVector) "xml" else extension
