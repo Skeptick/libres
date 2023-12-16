@@ -6,11 +6,14 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.api.DefaultAndroidSourceFile
 import com.android.build.gradle.tasks.GenerateResValues
 import com.android.ide.common.symbols.getPackageNameFromManifest
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.SourceSet
+import org.gradle.jvm.tasks.Jar
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -20,6 +23,8 @@ import org.jetbrains.kotlin.gradle.plugin.cocoapods.KotlinCocoapodsPlugin
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.sources.DefaultKotlinSourceSet
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.gradle.tasks.PodspecTask
 import java.io.File
 import io.github.skeptick.libres.plugin.SourceSet as PluginSourceSet
@@ -43,8 +48,8 @@ class ResourcesPlugin : Plugin<Project> {
                 if (!isKotlin || (isAndroid && !afterAndroid)) return@afterEvaluate
                 it.fetchSourceSets()
                 it.setDependencies()
-                it.registerSetupPodspecExportsTask()
                 it.registerGeneratorsTasks()
+                it.registerSetupIosExportTasks()
             }
         }
 
@@ -85,7 +90,8 @@ class ResourcesPlugin : Plugin<Project> {
     }
 
     private fun Project.fetchSourceSets() {
-        val outputDirectory = File(project.buildDir, "generated/libres")
+        val buildDir = layout.buildDirectory.asFile.get()
+        val outputDirectory = File(buildDir, "generated/libres")
         val kotlinExtension = project.extensions.getByType(KotlinProjectExtension::class.java)
         val commonSourceSet = kotlinExtension.sourceSets.findByName(KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME)
         val androidExtension = project.extensions.findByName("android") as BaseExtension?
@@ -95,7 +101,7 @@ class ResourcesPlugin : Plugin<Project> {
             commonSourceSet != null -> {
                 inputDirectories = commonSourceSet.resources.sourceDirectories.map { it.resolveSibling("libres") }
                 mainSourceSet = commonSourceSet.createKotlinSourceSet(outputDirectory, KotlinPlatform.Common)
-                allSourceSets += kotlinExtension.targets.takeKotlinSourceSet(outputDirectory, commonSourceSet)
+                allSourceSets += kotlinExtension.targets.takeKotlinSourceSet(outputDirectory)
                 if (androidExtension != null) allSourceSets += androidExtension.findAndroidSourceSet(true, outputDirectory, kotlinExtension)
                 allSourceSets += mainSourceSet
             }
@@ -171,11 +177,26 @@ class ResourcesPlugin : Plugin<Project> {
             }
             task.outputResourcesDirectories = allSourceSets.associateBy(PluginSourceSet::platform) {
                 when (it.platform) {
-                    KotlinPlatform.Apple -> File(it.resourcesDir, "images/${project.appleBundleName}.xcassets")
+                    KotlinPlatform.Apple -> it.appleAssetsDir(project)
                     KotlinPlatform.Js, KotlinPlatform.Jvm -> File(it.resourcesDir, "images")
                     else -> it.resourcesDir
                 }
             }
+        }
+
+        val bundleTask = project.tasks.register(GENERATE_BUNDLE_TASK_NAME, LibresBundleGenerationTask::class.java) { task ->
+            task.group = TASK_GROUP
+            task.bundleName = project.appleBundleName
+            task.filesToCopy = emptyList()
+            task.directoryToCompile = allSourceSets.firstNotNullOfOrNull {
+                if (it.platform == KotlinPlatform.Apple) it.appleAssetsDir(project) else null
+            }
+            task.outputDirectory = allSourceSets.firstNotNullOfOrNull {
+                if (it.platform == KotlinPlatform.Apple) File(it.rootDir, "libres-bundles") else null
+            }
+
+            task.onlyIf { Os.isFamily(Os.FAMILY_MAC) }
+            task.dependsOn(GENERATE_IMAGES_TASK_NAME)
         }
 
         val resourcesTask = project.tasks.register(GENERATE_RESOURCES_TASK_NAME, LibresResourcesGenerationTask::class.java) { task ->
@@ -191,42 +212,67 @@ class ResourcesPlugin : Plugin<Project> {
             task.dependsOn(imagesTask)
         }
 
-        project.tasks.apply {
-            getByName("build").dependsOn(resourcesTask)
-            withType(KotlinCompile::class.java).configureEach { it.dependsOn(resourcesTask) }
-            if (isAndroid) withType(GenerateResValues::class.java).configureEach { it.dependsOn(imagesTask) }
-            findByPath("desktopProcessResources")?.dependsOn(imagesTask)
-            findByPath("desktopSourcesJar")?.dependsOn(resourcesTask)
-            findByPath("jsProcessResources")?.dependsOn(imagesTask)
+        project.tasks.configureEach { projectTask ->
+            when {
+                projectTask is KotlinNativeCompile -> projectTask.dependsOn(bundleTask, resourcesTask)
+                projectTask is KotlinCompile<*> -> projectTask.dependsOn(resourcesTask)
+                projectTask is ProcessResources -> projectTask.dependsOn(imagesTask)
+                projectTask is Jar -> projectTask.dependsOn(resourcesTask)
+                isAndroid && projectTask is GenerateResValues -> projectTask.dependsOn(imagesTask)
+                projectTask.name.endsWith("ComposeResourcesForIos") -> projectTask.dependsOn(imagesTask)
+            }
         }
     }
 
-    private fun Project.registerSetupPodspecExportsTask() {
+    private fun Project.registerSetupIosExportTasks() {
         if (!plugins.hasPlugin(KotlinCocoapodsPlugin::class.java)) return
         val multiplatformExtension = extensions.findByType(KotlinMultiplatformExtension::class.java) ?: return
 
-        afterEvaluate {
-            val setupPodspecTask = tasks.register(SETUP_PODSPEC_TASK_NAME) { task ->
-                task.group = TASK_GROUP
-                task.doLast {
-                    multiplatformExtension.cocoapodsExtensionOrNull?.let {
-                        val exports = getCocoapodsExports(multiplatformExtension)
-                        createAssetsSymLinks(project, exports)
-                        it.extraSpecAttributes["resource_bundles"] = (exports + project).appleImageBundles(project)
-                    }
+        multiplatformExtension.cocoapodsExtensionOrNull?.let { cocoapods ->
+            cocoapods.ios.deploymentTarget?.let {  deploymentTarget ->
+                val exports = getCocoapodsExports(multiplatformExtension)
+                (exports + project).setIosDeploymentTarget(deploymentTarget)
+            }
+        }
+
+        val createBundlesSymlinksTask = tasks.register(CREATE_SYMLINKS_TASK_NAME) { task ->
+            task.group = TASK_GROUP
+            task.onlyIf { Os.isFamily(Os.FAMILY_MAC) }
+            task.doLast {
+                val exports = getCocoapodsExports(multiplatformExtension).filter { it.isPluginApplied }
+                createBundlesSymLinks(project, exports)
+            }
+        }
+
+        val setupPodspecTask = tasks.register(SETUP_PODSPEC_TASK_NAME) { task ->
+            task.group = TASK_GROUP
+            task.doLast {
+                multiplatformExtension.cocoapodsExtensionOrNull?.let { cocoapods ->
+                    val currentResources = cocoapods.extraSpecAttributes["resources"] ?: ""
+                    cocoapods.extraSpecAttributes["resources"] = project.appendAppleBundles(currentResources)
                 }
             }
+        }
 
-            tasks.withType(PodspecTask::class.java).all { compileTask ->
-                compileTask.dependsOn(setupPodspecTask)
+        tasks.configureEach { projectTask ->
+            when (projectTask) {
+                is PodspecTask -> projectTask.dependsOn(setupPodspecTask)
+                is KotlinNativeLink -> projectTask.dependsOn(createBundlesSymlinksTask)
+            }
+        }
+    }
+
+    private fun List<Project>.setIosDeploymentTarget(value: String)  = forEach { project ->
+        project.tasks.configureEach { task ->
+            if (task is LibresBundleGenerationTask) {
+                task.minimumDeploymentTarget = value
             }
         }
     }
 
     private fun Project.getCocoapodsExports(multiplatformExtension: KotlinMultiplatformExtension): List<Project> {
         val configName = multiplatformExtension.cocoapodsExportConfigurationName ?: return emptyList()
-        val exports = configurations.getByName(configName).dependencies.filterIsInstance<ProjectDependency>().map { it.dependencyProject }
-        return exports.filter { it.plugins.hasPlugin(ResourcesPlugin::class.java) }
+        return configurations.getByName(configName).dependencies.filterIsInstance<ProjectDependency>().map { it.dependencyProject }
     }
 
     companion object {
@@ -239,6 +285,8 @@ class ResourcesPlugin : Plugin<Project> {
         const val GENERATE_RESOURCES_TASK_NAME = "libresGenerateResources"
         const val GENERATE_STRINGS_TASK_NAME = "libresGenerateStrings"
         const val GENERATE_IMAGES_TASK_NAME = "libresGenerateImages"
+        const val GENERATE_BUNDLE_TASK_NAME = "libresGenerateIosBundle"
+        const val CREATE_SYMLINKS_TASK_NAME = "libresCreateSymlinkedBundles"
         const val SETUP_PODSPEC_TASK_NAME = "libresSetupPodspecExports"
 
         private val STRINGS_EXTENSIONS = listOf("xml")
@@ -261,6 +309,12 @@ class ResourcesPlugin : Plugin<Project> {
 
         private fun File.toOutputDirectory(packageName: String) =
             File(absolutePath, packageName.replace('.', File.separatorChar))
+
+        private fun PluginSourceSet.appleAssetsDir(project: Project): File =
+            File(resourcesDir, "images/${project.appleBundleName}.xcassets")
+
+        private val Project.isPluginApplied: Boolean
+            get() = plugins.hasPlugin(ResourcesPlugin::class.java)
 
     }
 

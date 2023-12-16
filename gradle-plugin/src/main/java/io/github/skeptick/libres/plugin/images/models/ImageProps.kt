@@ -14,7 +14,7 @@ internal class ImageProps(val file: File) {
         val parameters = ParametersRegex.findAll(nameWithoutExtension).toList()
         this.name = nameWithoutExtension.substringBefore("_(").lowercase()
         this.extension = file.extension.lowercase()
-        this.targetSize = if (extension != "svg") parameters.firstNotNullOfOrNull { it.groupValues[1].toIntOrNull() } else null
+        this.targetSize = if (!isVector) parameters.firstNotNullOfOrNull { it.groupValues[1].toIntOrNull() } else null
         this.isTintable = parameters.none { it.groupValues[1].startsWith("orig") }
     }
 

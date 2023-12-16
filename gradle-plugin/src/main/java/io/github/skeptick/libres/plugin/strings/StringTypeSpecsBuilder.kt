@@ -39,7 +39,7 @@ internal class StringTypeSpecsBuilder(
         stringsInterface.addTextResourceToInterface(resourceName, type)
         baseLocalizedObject.addTextResourceToLocalizedObject(resourceName, formattedResource, type, baseLanguageCode)
         stringObject.addTextResourceToStringsObject(resourceName, type, camelCaseForApple)
-        if (generateNamedArguments && baseParameters.isNotEmpty()) customClasses += CustomFormattedTextResourceClass(baseResource)
+        if (generateNamedArguments && baseParameters.isNotEmpty()) customClasses += CustomFormattedTextResourceClass(type, baseResource)
     }
 
     fun save(outputDirectory: File) {
@@ -68,12 +68,12 @@ private fun TextResource.fetchClass(packageName: String, hasParameters: Boolean,
     when (this) {
         is StringResource -> when {
             !hasParameters -> String::class.asTypeName()
-            generateNamedArguments -> ClassName(packageName, name.snakeCaseToCamelCase())
+            generateNamedArguments -> ClassName(packageName, "LibresFormat" + name.snakeCaseToCamelCase())
             else -> VoidFormattedString::class.asTypeName()
         }
         is PluralsResource -> when {
             !hasParameters -> VoidPluralString::class.asTypeName()
-            generateNamedArguments -> ClassName(packageName, name.snakeCaseToCamelCase())
+            generateNamedArguments -> ClassName(packageName, "LibresFormat" + name.snakeCaseToCamelCase())
             else -> VoidFormattedPluralString::class.asTypeName()
         }
     }

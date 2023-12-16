@@ -4,9 +4,10 @@ plugins {
     id("com.vanniktech.maven.publish")
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+version = property("VERSION_NAME").toString()
+
+kotlin {
+    jvmToolchain(11)
 }
 
 dependencies {
@@ -31,16 +32,12 @@ gradlePlugin {
     }
 }
 
-sourceSets {
-    getByName("main").java.srcDir("generated")
-}
-
-tasks.register("libresVersion") {
+val libresVersion = tasks.register("libresVersion") {
     val outputDir = file("generated")
     inputs.property("version", version)
     outputs.dir(outputDir)
 
-    doLast {
+    doFirst {
         val text = """
             // Generated file. Do not edit!
             package io.github.skeptick.libres
@@ -54,8 +51,6 @@ tasks.register("libresVersion") {
     }
 }
 
-afterEvaluate {
-    tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinCompile::class.java).configureEach {
-        dependsOn("libresVersion")
-    }
+sourceSets.main.configure {
+    kotlin.srcDir(libresVersion)
 }

@@ -8,7 +8,6 @@ import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import io.github.skeptick.libres.plugin.common.declarations.saveToDirectory
 import io.github.skeptick.libres.plugin.common.extensions.deleteFilesInDirectory
-import io.github.skeptick.libres.plugin.common.project.appleBundleName
 import io.github.skeptick.libres.plugin.images.ImagesTypeSpecsBuilder
 import io.github.skeptick.libres.plugin.images.declarations.EmptyImagesObject
 import io.github.skeptick.libres.plugin.images.declarations.ImagesObjectFile
