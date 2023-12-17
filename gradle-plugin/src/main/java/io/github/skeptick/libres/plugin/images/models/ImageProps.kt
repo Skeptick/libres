@@ -8,20 +8,22 @@ internal class ImageProps(val file: File) {
     val extension: String
     val targetSize: Int?
     val isTintable: Boolean
+    val isNightMode: Boolean
 
     init {
         val nameWithoutExtension = file.nameWithoutExtension
         val parameters = ParametersRegex.findAll(nameWithoutExtension).toList()
+
         this.name = nameWithoutExtension.substringBefore("_(").lowercase()
         this.extension = file.extension.lowercase()
         this.targetSize = if (!isVector) parameters.firstNotNullOfOrNull { it.groupValues[1].toIntOrNull() } else null
         this.isTintable = parameters.none { it.groupValues[1].startsWith("orig") }
+        this.isNightMode = parameters.any { it.groupValues[1] == "night" }
     }
 
     companion object {
         private val ParametersRegex = Regex("_\\((.*?)\\)")
     }
-
 }
 
 internal val ImageProps.isVector: Boolean get() = extension == "svg"
