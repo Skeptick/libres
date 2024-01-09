@@ -73,7 +73,7 @@ object PluralRules {
             "uk" -> Ukrainian
             "kk" -> Kazakh
             "fr" -> French
-            else -> custom[languageCode] ?: error("Plural rule for '$languageCode' not provided")
+            else -> custom[languageCode] ?: English
         }
     }
 
