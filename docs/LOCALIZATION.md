@@ -44,6 +44,8 @@ in JVM 3rd-party library is used. But in Apple this API is closed and in JS it's
 so to avoid burdening the library with heavy solutions, "out of the box" only rules are provided
 for [some languages](../libres-core/src/appleAndJsMain/kotlin/io/github/skeptick/libres/strings/PluralRules.kt).
 
+If there are no rules provided for a language, the library falls back to the English rules.
+
 You can create a Pull Request with the required languages or define these values at runtime:
 
 ```kotlin
