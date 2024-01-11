@@ -72,6 +72,14 @@ object PluralRules {
 
     private val Indonesian = PluralRule { Other }
 
+    private val Polish = PluralRule { number ->
+        when {
+            number == 1 -> One
+            (number % 10) in 2..4 && (number % 100) !in 12..14 -> Few
+            else -> Many
+        }
+    }
+
     operator fun set(languageCode: String, value: PluralRule) {
         custom[languageCode] = value
     }
@@ -85,6 +93,7 @@ object PluralRules {
             "fr" -> French
             "cs" -> Czech
             "id" -> Indonesian
+            "pl" -> Polish
             else -> custom[languageCode] ?: error("Plural rule for '$languageCode' not provided")
         }
     }
