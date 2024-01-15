@@ -91,6 +91,8 @@ object PluralRules {
 
     private val Japanese = PluralRule { Other }
 
+    private val Korean = PluralRule { Other }
+
     operator fun set(languageCode: String, value: PluralRule) {
         custom[languageCode] = value
     }
@@ -108,6 +110,7 @@ object PluralRules {
             "zh" -> Chinese
             "uz" -> Uzbek
             "ja" -> Japanese
+            "ko" -> Korean
             else -> custom[languageCode] ?: error("Plural rule for '$languageCode' not provided")
         }
     }
