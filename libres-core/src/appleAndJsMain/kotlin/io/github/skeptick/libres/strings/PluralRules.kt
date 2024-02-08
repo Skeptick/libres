@@ -62,6 +62,46 @@ object PluralRules {
         }
     }
 
+    private val Czech = PluralRule { number ->
+        when (number) {
+            1 -> One
+            in (2..4) -> Few
+            else -> Other
+        }
+    }
+
+    private val Indonesian = PluralRule { Other }
+
+    private val Polish = PluralRule { number ->
+        when {
+            number == 1 -> One
+            (number % 10) in 2..4 && (number % 100) !in 12..14 -> Few
+            else -> Many
+        }
+    }
+
+    private val Chinese = PluralRule { Other }
+
+    private val Uzbek = PluralRule { number ->
+        when (number) {
+            1 -> One
+            else -> Other
+        }
+    }
+
+    private val Japanese = PluralRule { Other }
+
+    private val Korean = PluralRule { Other }
+
+    private val Vietnamese = PluralRule { Other }
+
+    private val Finnish = PluralRule { number ->
+        when (number) {
+            1 -> One
+            else -> Other
+        }
+    }
+
     operator fun set(languageCode: String, value: PluralRule) {
         custom[languageCode] = value
     }
@@ -73,6 +113,15 @@ object PluralRules {
             "uk" -> Ukrainian
             "kk" -> Kazakh
             "fr" -> French
+            "cs" -> Czech
+            "id" -> Indonesian
+            "pl" -> Polish
+            "zh" -> Chinese
+            "uz" -> Uzbek
+            "ja" -> Japanese
+            "ko" -> Korean
+            "vi" -> Vietnamese
+            "fi" -> Finnish
             else -> custom[languageCode] ?: error("Plural rule for '$languageCode' not provided")
         }
     }
