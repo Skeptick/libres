@@ -10,10 +10,13 @@ android {
 }
 
 kotlin {
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
         commonMain {
             dependencies {
                 api(projects.libresCore)
+                implementation(libs.coroutines.core)
                 implementation(compose.ui)
             }
         }

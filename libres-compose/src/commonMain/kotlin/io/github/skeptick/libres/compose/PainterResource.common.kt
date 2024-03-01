@@ -7,5 +7,6 @@ import io.github.skeptick.libres.images.Image
 @Composable
 expect fun painterResource(image: Image): Painter
 
+@Suppress("unused")
 @Composable
 fun Image.painterResource() = painterResource(this)

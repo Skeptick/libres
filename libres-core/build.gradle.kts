@@ -29,10 +29,16 @@ kotlin {
             }
         }
 
-        val appleAndJsMain by creating {
+        val webMain by creating {
+            dependsOn(commonMain.get())
+            jsMain.get().dependsOn(this)
+            wasmJsMain.get().dependsOn(this)
+        }
+
+        val appleAndWebMain by creating {
             dependsOn(commonMain.get())
             appleMain.get().dependsOn(this)
-            jsMain.get().dependsOn(this)
+            webMain.dependsOn(this)
         }
 
         val uikitMain by creating {
