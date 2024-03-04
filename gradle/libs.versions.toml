@@ -1,7 +1,7 @@
 [versions]
 plugin-android = "8.2.2"
 plugin-publish-maven = "0.27.0"
-plugin-multiplatform-compose = "1.6.0-beta02"
+plugin-multiplatform-compose = "1.6.0"
 
 kotlin = "1.9.22"
 coroutines = "1.8.0"
@@ -11,7 +11,7 @@ icu4j = "74.2"
 jackson = "2.16.1"
 kotlinpoet = "1.16.0"
 javacv = "1.5.10"
-android-sdk-tools = "31.2.2"
+android-sdk-tools = "31.3.0"
 
 junit = "4.13.2"
 
