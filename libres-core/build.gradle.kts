@@ -29,10 +29,16 @@ kotlin {
             }
         }
 
+        val wasmAndJsCommon by creating {
+            dependsOn(commonMain.get())
+            jsMain.get().dependsOn(this)
+            wasmJsMain.get().dependsOn(this)
+        }
+
         val appleAndJsMain by creating {
             dependsOn(commonMain.get())
             appleMain.get().dependsOn(this)
-            jsMain.get().dependsOn(this)
+            wasmAndJsCommon.dependsOn(this)
         }
 
         val uikitMain by creating {

@@ -10,11 +10,31 @@ android {
 }
 
 kotlin {
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
         commonMain {
             dependencies {
                 api(projects.libresCore)
                 implementation(compose.ui)
+            }
+        }
+
+        val wasmAndJsCommon by creating {
+            dependsOn(commonMain.get())
+        }
+
+        jsMain {
+            dependsOn(wasmAndJsCommon)
+            dependencies {
+                compileOnly(libs.kotlinx.coroutines.core)
+            }
+        }
+
+        wasmJsMain {
+            dependsOn(wasmAndJsCommon)
+            dependencies {
+                compileOnly(libs.kotlinx.coroutines.core)
             }
         }
     }

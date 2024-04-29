@@ -1,3 +1,5 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl::class)
+
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
@@ -9,6 +11,9 @@ kotlin {
         publishAllLibraryVariants()
     }
     js(IR) {
+        browser()
+    }
+    wasmJs {
         browser()
     }
     iosX64()
