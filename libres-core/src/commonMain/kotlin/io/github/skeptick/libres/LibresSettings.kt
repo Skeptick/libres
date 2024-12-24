@@ -1,5 +1,5 @@
 package io.github.skeptick.libres
 
-object LibresSettings {
-    var languageCode: String? = null
+public object LibresSettings {
+    public var languageCode: String? = null
 }

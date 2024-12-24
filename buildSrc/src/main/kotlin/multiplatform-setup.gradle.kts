@@ -6,6 +6,13 @@ plugins {
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-Xexpect-actual-classes",
+            "-Xexplicit-api=strict"
+        )
+    }
+
     jvm()
     androidTarget {
         publishAllLibraryVariants()
@@ -23,10 +30,4 @@ kotlin {
     macosX64()
 
     jvmToolchain(17)
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs += "-Xexpect-actual-classes"
-        }
-    }
 }

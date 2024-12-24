@@ -1,12 +1,12 @@
 package io.github.skeptick.libres.strings
 
-class PluralForms(
-    val zero: String? = null,
-    val one: String? = null,
-    val two: String? = null,
-    val few: String? = null,
-    val many: String? = null,
-    val other: String? = null
+public class PluralForms(
+    public val zero: String? = null,
+    public val one: String? = null,
+    public val two: String? = null,
+    public val few: String? = null,
+    public val many: String? = null,
+    public val other: String? = null
 )
 
 internal operator fun PluralForms.get(key: String) =

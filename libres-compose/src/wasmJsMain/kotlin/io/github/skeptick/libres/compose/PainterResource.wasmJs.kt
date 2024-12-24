@@ -22,7 +22,7 @@ import org.khronos.webgl.get
 import org.w3c.fetch.Response
 
 @Composable
-actual fun painterResource(image: Image): Painter {
+public actual fun painterResource(image: Image): Painter {
     val state by produceState<ByteArray?>(initialValue = null, image) {
         val response = window.fetch(image).await<Response>()
         if (response.ok) value = response.byteArray()

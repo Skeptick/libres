@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import io.github.skeptick.libres.images.Image
 
 @Composable
-actual fun painterResource(image: Image): Painter {
+public actual fun painterResource(image: Image): Painter {
     return when (image.extension) {
         "svg" -> rememberSvgResource(image)
         else -> rememberBitmapResource(image)
