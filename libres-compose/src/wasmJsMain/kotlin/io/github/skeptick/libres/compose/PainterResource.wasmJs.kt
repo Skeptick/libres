@@ -42,7 +42,7 @@ private fun rememberSvgResource(name: String, bytes: ByteArray): Painter {
     val density = LocalDensity.current
     return remember(name, density) {
         val data = Data.makeFromBytes(bytes)
-        WasmJsSvgPainter(SVGDOM(data), density)
+        WebSvgPainter(SVGDOM(data), density)
     }
 }
 

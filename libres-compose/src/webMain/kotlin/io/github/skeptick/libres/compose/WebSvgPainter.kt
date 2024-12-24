@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import org.jetbrains.skia.svg.*
 import kotlin.math.ceil
 
-internal class JsSvgPainter(private val dom: SVGDOM, density: Density) : Painter() {
+internal class WebSvgPainter(private val dom: SVGDOM, density: Density) : Painter() {
 
     private val srcSize: Size = dom.pxSize ?: Size.Unspecified
 

@@ -21,5 +21,11 @@ kotlin {
                 implementation(compose.ui)
             }
         }
+
+        val webMain by creating {
+            dependsOn(commonMain.get())
+            jsMain.get().dependsOn(this)
+            wasmJsMain.get().dependsOn(this)
+        }
     }
 }
