@@ -14,7 +14,7 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.tasks.SourceSet
 import org.gradle.jvm.tasks.Jar
 import org.gradle.language.jvm.tasks.ProcessResources
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.gradle.util.GradleVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -200,7 +200,8 @@ class ResourcesPlugin : Plugin<Project> {
         project.tasks.configureEach { projectTask ->
             when {
                 projectTask is KotlinNativeCompile -> projectTask.dependsOn(bundleTask, resourcesTask)
-                projectTask is KotlinCompile<*> -> projectTask.dependsOn(resourcesTask)
+                projectTask is org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*> -> projectTask.dependsOn(resourcesTask)
+                projectTask is org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*> -> projectTask.dependsOn(resourcesTask)
                 projectTask is ProcessResources -> projectTask.dependsOn(imagesTask)
                 projectTask is Jar -> projectTask.dependsOn(resourcesTask)
                 isAndroid && projectTask is GenerateResValues -> projectTask.dependsOn(imagesTask)
@@ -212,13 +213,6 @@ class ResourcesPlugin : Plugin<Project> {
     private fun Project.registerSetupIosExportTasks() {
         if (!plugins.hasPlugin(KotlinCocoapodsPlugin::class.java)) return
         val multiplatformExtension = extensions.findByType(KotlinMultiplatformExtension::class.java) ?: return
-
-        multiplatformExtension.cocoapodsExtensionOrNull?.let { cocoapods ->
-            cocoapods.ios.deploymentTarget?.let {  deploymentTarget ->
-                val exports = getCocoapodsExports(multiplatformExtension)
-                (exports + project).setIosDeploymentTarget(deploymentTarget)
-            }
-        }
 
         val createBundlesSymlinksTask = tasks.register(CREATE_SYMLINKS_TASK_NAME) { task ->
             task.group = TASK_GROUP
@@ -247,17 +241,16 @@ class ResourcesPlugin : Plugin<Project> {
         }
     }
 
-    private fun List<Project>.setIosDeploymentTarget(value: String)  = forEach { project ->
-        project.tasks.configureEach { task ->
-            if (task is LibresBundleGenerationTask) {
-                task.minimumDeploymentTarget = value
-            }
-        }
-    }
-
     private fun Project.getCocoapodsExports(multiplatformExtension: KotlinMultiplatformExtension): List<Project> {
         val configName = multiplatformExtension.cocoapodsExportConfigurationName ?: return emptyList()
-        return configurations.getByName(configName).dependencies.filterIsInstance<ProjectDependency>().map { it.dependencyProject }
+        return configurations.getByName(configName).dependencies.filterIsInstance<ProjectDependency>().map { dependency ->
+            if (GradleVersion.current() < GradleVersion.version("8.11")) {
+                @Suppress("DEPRECATION")
+                dependency.dependencyProject
+            } else {
+                project(dependency.path)
+            }
+        }
     }
 
     companion object {
