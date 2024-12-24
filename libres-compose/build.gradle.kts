@@ -3,6 +3,7 @@ plugins {
     id("android-setup-plugin")
     id("com.vanniktech.maven.publish")
     id("org.jetbrains.compose")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {

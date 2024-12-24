@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
 plugins {
     id("com.android.library")
@@ -10,10 +10,9 @@ kotlin {
     androidTarget {
         publishAllLibraryVariants()
     }
-    js(IR) {
+    js {
         browser()
     }
-    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
     }

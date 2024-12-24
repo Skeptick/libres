@@ -29,6 +29,12 @@ kotlin {
             }
         }
 
+        wasmJsMain {
+            dependencies {
+                implementation(libs.browser)
+            }
+        }
+
         val webMain by creating {
             dependsOn(commonMain.get())
             jsMain.get().dependsOn(this)
