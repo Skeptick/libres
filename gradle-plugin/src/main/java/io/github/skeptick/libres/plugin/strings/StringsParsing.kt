@@ -10,11 +10,29 @@ private typealias Resources = Map<LanguageCode, List<TextResource>>
 
 private val xmlMapper = XmlMapper()
 
-internal fun parseStringResources(inputFiles: Set<File>, baseLocaleLanguageCode: LanguageCode): Resources {
-    val filesByLocale = inputFiles.groupBy { it.name.substringAfterLast("_").substringBefore(".") }
-    if (filesByLocale[baseLocaleLanguageCode].isNullOrEmpty()) throw BaseStringResourcesNotFoundException()
+internal fun parseStringResources(
+    listInputFiles: List<Set<File>>,
+    baseLocaleLanguageCode: LanguageCode
+): Resources {
+    val resources = listInputFiles
+        .map { inputFiles ->
+            val filesByLocale =
+                inputFiles.groupBy { it.name.substringAfterLast("_").substringBefore(".") }
 
-    val resources = filesByLocale.mapValues { (_, files) -> files.map(xmlMapper::readTree).flatMap(JsonNode::parseResources) }
+            if (filesByLocale[baseLocaleLanguageCode].isNullOrEmpty()) throw BaseStringResourcesNotFoundException()
+
+            filesByLocale.mapValues { (_, files) -> files.map(xmlMapper::readTree).flatMap(JsonNode::parseResources) }
+        }
+        .fold(mutableMapOf<String, MutableMap<String, TextResource>>()) { mutableAccumulator, resource ->
+            for ((lang, list) in resource) {
+                mutableAccumulator.getOrPut(lang, ::mutableMapOf).putAll(list.associateBy { it.name })
+            }
+            mutableAccumulator
+        }
+        .map { (lang, map) ->
+            lang to map.values.toList()
+        }
+        .toMap()
     resources.validateNames(baseLocaleLanguageCode)
     resources.validateDuplicatesAndArguments()
     return resources
