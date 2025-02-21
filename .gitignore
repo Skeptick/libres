@@ -5,6 +5,7 @@
 .classpath
 .vscode
 .idea
+.kotlin
 !/.idea/codeStyles
 .run
 build

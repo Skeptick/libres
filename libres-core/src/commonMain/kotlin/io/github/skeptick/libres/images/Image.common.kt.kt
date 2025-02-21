@@ -1,3 +1,3 @@
 package io.github.skeptick.libres.images
 
-expect class Image
+public expect class Image

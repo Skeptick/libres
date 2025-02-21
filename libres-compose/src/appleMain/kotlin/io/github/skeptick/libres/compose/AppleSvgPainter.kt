@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package io.github.skeptick.libres.compose
 
 import androidx.compose.ui.geometry.Size

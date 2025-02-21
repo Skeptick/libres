@@ -5,7 +5,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import io.github.skeptick.libres.images.Image
 
 @Composable
-expect fun painterResource(image: Image): Painter
+public expect fun painterResource(image: Image): Painter
 
+@Suppress("unused")
 @Composable
-fun Image.painterResource() = painterResource(this)
+public fun Image.painterResource() = painterResource(this)

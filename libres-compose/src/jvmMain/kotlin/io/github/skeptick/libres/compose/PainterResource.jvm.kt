@@ -4,7 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import io.github.skeptick.libres.images.Image
 
+@Suppress("DEPRECATION")
 @Composable
-actual fun painterResource(image: Image): Painter {
+public actual fun painterResource(image: Image): Painter {
     return androidx.compose.ui.res.painterResource(image)
 }

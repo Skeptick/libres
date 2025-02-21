@@ -5,7 +5,7 @@ import android.os.Build
 import libcore.icu.NativePluralRules
 import java.util.Locale
 
-actual fun getPluralizedString(forms: PluralForms, languageCode: String, number: Int): String {
+public actual fun getPluralizedString(forms: PluralForms, languageCode: String, number: Int): String {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         val rules = PluralRules.forLocale(Locale(languageCode))
         val form = rules.select(number.toDouble())

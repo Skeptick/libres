@@ -7,22 +7,25 @@ import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.pathString
 
-internal const val appleBundlesDirectory = "generated/libres/apple/libres-bundles"
+private const val appleBundlesDirectory = "generated/libres/apple/libres-bundles"
 
 internal fun Project.appendAppleBundles(currentResources: String): String {
     File(buildDirectory, appleBundlesDirectory).mkdirs()
     val path = "'${buildDirectory.relativeTo(projectDir).path}/$appleBundlesDirectory'"
-    if (currentResources.isBlank() || currentResources.trim().matches(Regex("^\\[\\s*]$"))) return "[$path]"
-    val existPaths = currentResources.substringAfter('[').substringBeforeLast(']')
-    return "[$existPaths, $path]"
+    return if (currentResources.isBlank() || currentResources.trim().matches(Regex("^\\[\\s*]$"))) {
+        "[$path]"
+    } else {
+        val existPaths = currentResources.substringAfter('[').substringBeforeLast(']')
+        "[$existPaths, $path]"
+    }
 }
 
-internal fun createBundlesSymLinks(rootProject: Project, exportedProjects: List<Project>) {
-    val rootBundlesDir = Path(rootProject.buildDirectory.absolutePath, appleBundlesDirectory)
-    val rootBundleName = rootProject.appleBundleName
-    val rootBundle = Path(rootProject.buildDirectory.absolutePath, appleBundlesDirectory, "${rootBundleName}.bundle")
-    if (!Files.exists(rootBundle)) Files.createDirectories(rootBundle)
-    exportedProjects.forEach { rootBundlesDir.addSymlinkToBundle(it) }
+internal fun createBundlesSymLinks(umbrella: Project, exports: List<Project>) {
+    val umbrellaBundleName = umbrella.appleBundleName
+    val bundlesDir = Path(umbrella.buildDirectory.absolutePath, appleBundlesDirectory)
+    val umbrellaBundle = Path(bundlesDir.pathString, "${umbrellaBundleName}.bundle")
+    if (!Files.exists(umbrellaBundle)) Files.createDirectories(umbrellaBundle)
+    exports.forEach { addSymlinkToBundle(bundlesDir = bundlesDir, export = it) }
 }
 
 internal val Project.appleBundleName: String
@@ -30,10 +33,10 @@ internal val Project.appleBundleName: String
         partOfName.replaceFirstChar { it.titlecase() }
     }
 
-private fun Path.addSymlinkToBundle(project: Project) {
-    val bundleName = project.appleBundleName
-    val target = Path(project.buildDirectory.absolutePath, appleBundlesDirectory, "${bundleName}.bundle")
-    val link = Path(pathString, "${bundleName}.bundle")
+private fun addSymlinkToBundle(bundlesDir: Path, export: Project) {
+    val bundleName = export.appleBundleName
+    val target = Path(export.buildDirectory.absolutePath, appleBundlesDirectory, "${bundleName}.bundle")
+    val link = Path(bundlesDir.pathString, "${bundleName}.bundle")
     if (!Files.exists(target)) Files.createDirectories(target)
     if (!Files.exists(link)) Files.createSymbolicLink(link, target)
 }

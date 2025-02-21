@@ -2,12 +2,12 @@
 
 package io.github.skeptick.libres.strings
 
-class VoidPluralString(private val forms: PluralForms, private val languageCode: String) {
-    fun format(number: Int) = getPluralizedString(forms, languageCode, number)
+public class VoidPluralString(private val forms: PluralForms, private val languageCode: String) {
+    public fun format(number: Int): String = getPluralizedString(forms, languageCode, number)
 }
 
-class VoidFormattedPluralString(private val forms: PluralForms, private val languageCode: String) {
-    fun format(number: Int, vararg args: String) = formatString(getPluralizedString(forms, languageCode, number), args)
+public class VoidFormattedPluralString(private val forms: PluralForms, private val languageCode: String) {
+    public fun format(number: Int, vararg args: String): String = formatString(getPluralizedString(forms, languageCode, number), args)
 }
 
-expect fun getPluralizedString(forms: PluralForms, languageCode: String, number: Int): String
+public expect fun getPluralizedString(forms: PluralForms, languageCode: String, number: Int): String

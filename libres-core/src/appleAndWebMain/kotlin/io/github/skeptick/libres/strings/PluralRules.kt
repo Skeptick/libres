@@ -2,11 +2,11 @@ package io.github.skeptick.libres.strings
 
 import io.github.skeptick.libres.strings.PluralForm.*
 
-fun interface PluralRule {
-    fun getForm(number: Int): PluralForm
+public fun interface PluralRule {
+    public fun getForm(number: Int): PluralForm
 }
 
-enum class PluralForm(internal val formName: String) {
+public enum class PluralForm(internal val formName: String) {
     Zero("zero"),
     One("one"),
     Two("two"),
@@ -15,7 +15,7 @@ enum class PluralForm(internal val formName: String) {
     Other("other")
 }
 
-object PluralRules {
+public object PluralRules {
 
     private val custom = mutableMapOf<String, PluralRule>()
 
@@ -62,11 +62,11 @@ object PluralRules {
         }
     }
 
-    operator fun set(languageCode: String, value: PluralRule) {
+    public operator fun set(languageCode: String, value: PluralRule) {
         custom[languageCode] = value
     }
 
-    operator fun get(languageCode: String): PluralRule {
+    public operator fun get(languageCode: String): PluralRule {
         return when (languageCode) {
             "en" -> English
             "ru" -> Russian
@@ -77,11 +77,11 @@ object PluralRules {
         }
     }
 
-    operator fun plus(value: Pair<String, PluralRule>) {
+    public operator fun plus(value: Pair<String, PluralRule>) {
         custom[value.first] = value.second
     }
 
-    operator fun plusAssign(map: Map<String, PluralRule>) {
+    public operator fun plusAssign(map: Map<String, PluralRule>) {
         custom += map
     }
 

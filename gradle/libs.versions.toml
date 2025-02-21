@@ -1,16 +1,18 @@
 [versions]
-plugin-android = "8.1.2"
-plugin-publish-maven = "0.25.3"
-plugin-multiplatform-compose = "1.5.10"
+plugin-android = "8.7.3"
+plugin-publish-maven = "0.30.0"
 
-kotlin = "1.9.20"
-androidx-core = "1.12.0"
+kotlin = "2.1.0"
+compose-jb = "1.7.3"
+coroutines = "1.10.1"
+browser = "0.3"
+androidx-core = "1.15.0"
 robovm = "1.0.0"
-icu4j = "74.1"
-jackson = "2.16.0"
-kotlinpoet = "1.15.2"
-javacv = "1.5.9"
-android-sdk-tools = "31.2.0"
+icu4j = "76.1"
+jackson = "2.18.2"
+kotlinpoet = "2.0.0"
+javacv = "1.5.11"
+android-sdk-tools = "31.7.3"
 
 junit = "4.13.2"
 
@@ -18,8 +20,11 @@ junit = "4.13.2"
 plugin-android = { module = "com.android.tools.build:gradle", version.ref = "plugin-android" }
 plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 plugin-publish-maven = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "plugin-publish-maven" }
-plugin-multiplatform-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "plugin-multiplatform-compose" }
+plugin-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-jb" }
+plugin-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "browser" }
 androidx-core = { module = "androidx.core:core", version.ref = "androidx-core" }
 robovm = { module = "org.robovm:robovm-rt", version.ref = "robovm" }
 icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }

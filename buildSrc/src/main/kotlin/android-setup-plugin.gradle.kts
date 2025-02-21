@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 16
@@ -11,10 +11,5 @@ android {
 
     buildFeatures {
         buildConfig = false
-    }
-
-    compileOptions.apply {
-        targetCompatibility = JavaVersion.VERSION_1_8
-        sourceCompatibility = JavaVersion.VERSION_1_8
     }
 }

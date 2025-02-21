@@ -20,7 +20,7 @@ import org.khronos.webgl.Int8Array
 import org.w3c.fetch.Response
 
 @Composable
-actual fun painterResource(image: Image): Painter {
+public actual fun painterResource(image: Image): Painter {
     val state by produceState<ByteArray?>(initialValue = null, image) {
         val response = window.fetch(image).await()
         if (response.ok) value = response.byteArray()
@@ -40,7 +40,7 @@ private fun rememberSvgResource(name: String, bytes: ByteArray): Painter {
     val density = LocalDensity.current
     return remember(name, density) {
         val data = Data.makeFromBytes(bytes)
-        JsSvgPainter(SVGDOM(data), density)
+        WebSvgPainter(SVGDOM(data), density)
     }
 }
 

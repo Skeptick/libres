@@ -11,9 +11,6 @@ abstract class LibresBundleGenerationTask : DefaultTask() {
     @get:Input
     internal abstract var bundleName: String
 
-    @get:Input
-    internal var minimumDeploymentTarget: String = "9.0"
-
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
     @get:Optional
@@ -42,7 +39,7 @@ abstract class LibresBundleGenerationTask : DefaultTask() {
             "--output-format", "human-readable-text",
             "--notices", "--warnings",
             "--platform", "iphoneos",
-            "--minimum-deployment-target", minimumDeploymentTarget,
+            "--minimum-deployment-target", "13.0",
             "--target-device", "iphone",
             "--compress-pngs"
         ).start().let { process ->

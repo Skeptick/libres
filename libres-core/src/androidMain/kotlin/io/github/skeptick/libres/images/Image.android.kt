@@ -1,3 +1,3 @@
 package io.github.skeptick.libres.images
 
-actual typealias Image = Int
+public actual typealias Image = Int
