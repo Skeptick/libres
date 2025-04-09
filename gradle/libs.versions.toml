@@ -1,18 +1,18 @@
 [versions]
 plugin-android = "8.7.3"
-plugin-publish-maven = "0.30.0"
+plugin-publish-maven = "0.31.0"
 
-kotlin = "2.1.0"
-compose-jb = "1.7.3"
-coroutines = "1.10.1"
+kotlin = "2.1.20"
+compose-jb = "1.8.0-beta01"
+coroutines = "1.10.2"
 browser = "0.3"
 androidx-core = "1.15.0"
 robovm = "1.0.0"
-icu4j = "76.1"
-jackson = "2.18.2"
-kotlinpoet = "2.0.0"
+icu4j = "77.1"
+jackson = "2.18.3"
+kotlinpoet = "2.1.0"
 javacv = "1.5.11"
-android-sdk-tools = "31.7.3"
+android-sdk-tools = "31.9.1"
 
 junit = "4.13.2"
 
