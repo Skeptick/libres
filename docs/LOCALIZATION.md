@@ -59,4 +59,4 @@ PluralRules["en"] = PluralRule { number ->
 ```
 
 When defining rules you can refer to
-[this document](https://unicode-org.github.io/cldr-staging/charts/37/supplemental/language_plural_rules.html).
+[this document](https://www.unicode.org/cldr/charts/44/supplemental/language_plural_rules.html).
