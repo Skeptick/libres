@@ -16,8 +16,6 @@ dependencies {
     implementation(libs.jackson.xml)
     implementation(libs.jackson.kotlin)
     implementation(libs.kotlinpoet)
-    implementation(libs.javacv)
-    compileOnly(libs.android.sdk.tools)
     compileOnly(libs.plugin.kotlin)
     compileOnly(libs.plugin.android)
     testImplementation(libs.junit)

@@ -5,35 +5,32 @@ package io.github.skeptick.libres.plugin.strings
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
-import io.github.skeptick.libres.plugin.StringsSettings
-import io.github.skeptick.libres.plugin.common.declarations.saveToDirectory
+import io.github.skeptick.libres.plugin.common.declarations.saveTo
 import io.github.skeptick.libres.plugin.strings.declarations.*
 import io.github.skeptick.libres.plugin.strings.models.*
 import io.github.skeptick.libres.strings.*
-import java.io.File
+import org.gradle.api.file.Directory
 
 internal class StringTypeSpecsBuilder(
-    private val settings: StringsSettings,
-    private val languageCodes: Set<LanguageCode>
+    private val outputPackageName: String,
+    private val outputClassName: String,
+    private val languageCodes: Set<LanguageCode>,
+    private val baseLanguageCode: String,
+    private val generateNamedArguments: Boolean,
+    private val camelCaseForApple: Boolean,
 ) {
 
-    private val packageName = settings.outputPackageName
-    private val className = settings.outputClassName
-    private val baseLanguageCode = settings.baseLocaleLanguageCode
-    private val generateNamedArguments = settings.generateNamedArguments
-    private val camelCaseForApple = settings.camelCaseForApple
-
     private val stringsInterface = StringsInterface()
-    private val localizedObjects = languageCodes.associateWith { LocalizedStringsObject(packageName, it) }
+    private val localizedObjects = languageCodes.associateWith { LocalizedStringsObject(outputPackageName, it) }
     private val baseLocalizedObject = localizedObjects.getValue(baseLanguageCode)
-    private val stringObject = StringObject(packageName, className, baseLanguageCode, languageCodes, camelCaseForApple)
+    private val stringObject = StringObject(outputPackageName, outputClassName, baseLanguageCode, languageCodes, camelCaseForApple)
     private val customClasses = mutableListOf<TypeSpec.Builder>()
 
     fun appendResource(baseResource: TextResource, localizedResources: Map<LanguageCode, TextResource?>) {
         val resourceName = baseResource.name
         val baseParameters = baseResource.parameters
         val formattedResource = baseResource.replaceParameters(baseParameters, baseLanguageCode)
-        val type = baseResource.fetchClass(packageName, baseParameters.isNotEmpty(), generateNamedArguments)
+        val type = baseResource.fetchClass(outputPackageName, baseParameters.isNotEmpty(), generateNamedArguments)
 
         baseResource.appendLocalizedResources(localizedResources, type)
         stringsInterface.addTextResourceToInterface(resourceName, type)
@@ -42,11 +39,11 @@ internal class StringTypeSpecsBuilder(
         if (generateNamedArguments && baseParameters.isNotEmpty()) customClasses += CustomFormattedTextResourceClass(type, baseResource)
     }
 
-    fun save(outputDirectory: File) {
-        StringsInterfaceFile(packageName, stringsInterface).saveToDirectory(outputDirectory)
-        StringsObjectFile(packageName, stringObject).saveToDirectory(outputDirectory)
-        localizedObjects.forEach { StringsObjectFile(packageName, it.value).saveToDirectory(outputDirectory) }
-        if (customClasses.isNotEmpty()) FormattedClassesFile(packageName, customClasses).saveToDirectory(outputDirectory)
+    fun save(outputDirectory: Directory) {
+        StringsInterfaceFile(outputPackageName, stringsInterface).saveTo(outputDirectory)
+        StringsObjectFile(outputPackageName, stringObject).saveTo(outputDirectory)
+        localizedObjects.forEach { StringsObjectFile(outputPackageName, it.value).saveTo(outputDirectory) }
+        if (customClasses.isNotEmpty()) FormattedClassesFile(outputPackageName, customClasses).saveTo(outputDirectory)
     }
 
     private fun TextResource.appendLocalizedResources(localizedResources: Map<LanguageCode, TextResource?>, type: ClassName) {
@@ -83,7 +80,7 @@ private fun TextResource.replaceParameters(parameters: Set<String>, languageCode
         is StringResource -> copy(
             value = value.replaceNamedArguments { _, argument ->
                 val actualIndex = parameters.indexOf(argument)
-                if (actualIndex != -1) "%${actualIndex + 1}\$s"
+                if (actualIndex != -1) $$"%$${actualIndex + 1}$s"
                 else throw ParameterNotFoundException(languageCode, name, argument)
             }
         )

@@ -7,30 +7,39 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import io.github.skeptick.libres.plugin.common.declarations.ResourcesFile
 import io.github.skeptick.libres.plugin.common.declarations.ResourcesObject
-import io.github.skeptick.libres.plugin.common.declarations.saveToDirectory
-import io.github.skeptick.libres.plugin.common.extensions.deleteFilesInDirectory
-import java.io.File
+import io.github.skeptick.libres.plugin.common.declarations.saveTo
+import io.github.skeptick.libres.plugin.common.extensions.deleteFiles
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
 
 @CacheableTask
 abstract class LibresResourcesGenerationTask : DefaultTask() {
 
     @get:Input
-    internal abstract var settings: ResourcesSettings
+    internal abstract val outputPackageName: Property<String>
+
+    @get:Input
+    internal abstract val outputClassName: Property<String>
+
+    @get:Input
+    internal abstract val stringsOutputPackageName: Property<String>
 
     @get:OutputDirectory
-    internal abstract var outputDirectory: File
+    internal abstract val outputDirectory: DirectoryProperty
 
     @TaskAction
     fun apply() {
-        val className = settings.outputClassName
-        val packageName = settings.outputPackageName
-        val stringsPackageName = settings.stringsPackageName
-        val imagesPackageName = settings.imagesPackageName
+        val className = outputClassName.get()
+        val packageName = outputPackageName.get()
+        val stringsPackageName = stringsOutputPackageName.get()
 
-        outputDirectory.deleteFilesInDirectory()
-        val resourcesObjectTypeSpec = ResourcesObject(className, stringsPackageName, imagesPackageName)
+        val resourcesObjectTypeSpec = ResourcesObject(className, stringsPackageName)
         val resourcesFileSpec = ResourcesFile(packageName, className, resourcesObjectTypeSpec)
-        resourcesFileSpec.saveToDirectory(outputDirectory)
+
+        outputDirectory.get().let { outputDir ->
+            outputDir.deleteFiles()
+            resourcesFileSpec.saveTo(outputDir)
+        }
     }
 
 }

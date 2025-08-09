@@ -1,43 +1,71 @@
 package io.github.skeptick.libres.plugin
 
+import io.github.skeptick.libres.plugin.common.declarations.saveTo
+import io.github.skeptick.libres.plugin.common.extensions.deleteFiles
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.*
-import io.github.skeptick.libres.plugin.common.declarations.saveToDirectory
-import io.github.skeptick.libres.plugin.common.extensions.deleteFilesInDirectory
 import io.github.skeptick.libres.plugin.strings.*
 import io.github.skeptick.libres.plugin.strings.declarations.*
 import io.github.skeptick.libres.plugin.strings.models.*
-import java.io.File
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
 
 @CacheableTask
 abstract class LibresStringGenerationTask : DefaultTask() {
 
     @get:Input
-    internal abstract var settings: StringsSettings
+    internal abstract val outputPackageName: Property<String>
+
+    @get:Input
+    internal abstract val outputClassName: Property<String>
+
+    @get:Input
+    internal abstract val baseLocaleLanguageCode: Property<String>
+
+    @get:Input
+    internal abstract val generateNamedArguments: Property<Boolean>
+
+    @get:Input
+    internal abstract val camelCaseNamesForAppleFramework: Property<Boolean>
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    internal abstract var inputDirectory: FileCollection
+    @get:IgnoreEmptyDirectories
+    internal abstract val inputFiles: ConfigurableFileCollection
 
     @get:OutputDirectory
-    internal abstract var outputDirectory: File
+    internal abstract val outputDirectory: DirectoryProperty
 
     @TaskAction
     fun apply() {
-        inputDirectory.files
-            .takeIf { files -> files.isNotEmpty() }
-            ?.let { files -> parseStringResources(files, settings.baseLocaleLanguageCode) }
-            ?.takeIf { resources -> resources.getValue(settings.baseLocaleLanguageCode).isNotEmpty() }
-            ?.let { resources -> buildResources(resources) }
-            ?: buildEmptyResources()
+        if (inputFiles.isEmpty) {
+            buildEmptyResources()
+        } else {
+            val stringResources = parseStringResources(
+                inputFiles = inputFiles.files,
+                baseLocaleLanguageCode = baseLocaleLanguageCode.get()
+            )
+            if (stringResources.getValue(baseLocaleLanguageCode.get()).isNotEmpty()) {
+                buildResources(stringResources)
+            } else {
+                buildEmptyResources()
+            }
+        }
     }
 
     private fun buildResources(resources: Map<LanguageCode, List<TextResource>>) {
-        val builder = StringTypeSpecsBuilder(settings, resources.keys)
+        val builder = StringTypeSpecsBuilder(
+            outputPackageName = outputPackageName.get(),
+            outputClassName = outputClassName.get(),
+            languageCodes = resources.keys,
+            baseLanguageCode = baseLocaleLanguageCode.get(),
+            generateNamedArguments = generateNamedArguments.get(),
+            camelCaseForApple = camelCaseNamesForAppleFramework.get()
+        )
         val resourceByLanguageCodes = resources.mapValues { it.value.associateBy(TextResource::name) }
 
-        resources.getValue(settings.baseLocaleLanguageCode).forEach { baseResource ->
+        resources.getValue(baseLocaleLanguageCode.get()).forEach { baseResource ->
             builder.appendResource(
                 baseResource = baseResource,
                 localizedResources = resources.mapValues {
@@ -46,15 +74,20 @@ abstract class LibresStringGenerationTask : DefaultTask() {
             )
         }
 
-        outputDirectory.deleteFilesInDirectory()
-        builder.save(outputDirectory)
+        outputDirectory.get().let { outputDir ->
+            outputDir.deleteFiles()
+            builder.save(outputDir)
+        }
     }
 
     private fun buildEmptyResources() {
-        val stringObjectTypeSpec = EmptyStringObject(settings.outputClassName)
-        val stringsFileSpec = StringsObjectFile(settings.outputPackageName, stringObjectTypeSpec)
-        outputDirectory.deleteFilesInDirectory()
-        stringsFileSpec.saveToDirectory(outputDirectory)
+        val stringObjectTypeSpec = EmptyStringObject(outputClassName.get())
+        val stringsFileSpec = StringsObjectFile(outputPackageName.get(), stringObjectTypeSpec)
+
+        outputDirectory.get().let { outputDir ->
+            outputDir.deleteFiles()
+            stringsFileSpec.saveTo(outputDir)
+        }
     }
 
 }

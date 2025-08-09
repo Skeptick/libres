@@ -6,7 +6,9 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 
 private val OptIn = ClassName("kotlin", "OptIn")
+
 private val ExperimentalObjCName = ClassName("kotlin.experimental", "ExperimentalObjCName")
+
 private val ObjCName = ClassName("kotlin.native", "ObjCName")
 
 internal fun TypeSpec.Builder.addExperimentalObjCNameAnnotation(condition: Boolean): TypeSpec.Builder {
