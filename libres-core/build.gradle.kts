@@ -46,11 +46,5 @@ kotlin {
             appleMain.get().dependsOn(this)
             webMain.dependsOn(this)
         }
-
-        val uikitMain by creating {
-            dependsOn(appleMain.get())
-            iosMain.get().dependsOn(this)
-            tvosMain.get().dependsOn(this)
-        }
     }
 }
