@@ -1,18 +1,16 @@
 [versions]
-plugin-android = "8.7.3"
-plugin-publish-maven = "0.31.0"
+plugin-android = "8.10.0"
+plugin-publish-maven = "0.34.0"
 
-kotlin = "2.1.20"
-compose-jb = "1.8.0-beta01"
+kotlin = "2.2.0"
+compose-jb = "1.8.2"
 coroutines = "1.10.2"
-browser = "0.3"
-androidx-core = "1.15.0"
+browser = "0.4"
+androidx-core = "1.16.0"
 robovm = "1.0.0"
 icu4j = "77.1"
-jackson = "2.18.3"
-kotlinpoet = "2.1.0"
-javacv = "1.5.11"
-android-sdk-tools = "31.9.1"
+jackson = "2.19.2"
+kotlinpoet = "2.2.0"
 
 junit = "4.13.2"
 
@@ -31,7 +29,5 @@ icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
 jackson-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
-javacv = { module = "org.bytedeco:javacv-platform", version.ref = "javacv" }
-android-sdk-tools = { module = "com.android.tools:sdk-common", version.ref = "android-sdk-tools" }
 
 junit = { module = "junit:junit", version.ref = "junit" }

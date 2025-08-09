@@ -15,7 +15,7 @@ kotlin {
 
     jvm()
     androidTarget {
-        publishAllLibraryVariants()
+        publishLibraryVariants("release")
     }
     js {
         browser()
