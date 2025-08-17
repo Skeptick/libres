@@ -23,3 +23,7 @@ kotlin {
         }
     }
 }
+
+compose.resources {
+    generateResClass = never
+}

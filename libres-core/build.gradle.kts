@@ -16,16 +16,15 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
     sourceSets {
-        androidMain {
+        commonMain {
             dependencies {
-                implementation(libs.androidx.core)
-                compileOnly(libs.robovm)
+                implementation(projects.libresPluralRules)
             }
         }
 
-        jvmMain {
+        androidMain {
             dependencies {
-                implementation(libs.icu4j)
+                implementation(libs.androidx.core)
             }
         }
 
@@ -33,18 +32,6 @@ kotlin {
             dependencies {
                 implementation(libs.browser)
             }
-        }
-
-        val webMain by creating {
-            dependsOn(commonMain.get())
-            jsMain.get().dependsOn(this)
-            wasmJsMain.get().dependsOn(this)
-        }
-
-        val appleAndWebMain by creating {
-            dependsOn(commonMain.get())
-            appleMain.get().dependsOn(this)
-            webMain.dependsOn(this)
         }
     }
 }

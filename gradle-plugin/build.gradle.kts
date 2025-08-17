@@ -18,7 +18,7 @@ dependencies {
     implementation(libs.kotlinpoet)
     compileOnly(libs.plugin.kotlin)
     compileOnly(libs.plugin.android)
-    testImplementation(libs.junit)
+    testImplementation(libs.test.junit)
 }
 
 gradlePlugin {

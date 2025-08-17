@@ -8,8 +8,6 @@ coroutines = "1.10.2"
 serialization = "1.9.0"
 browser = "0.4"
 androidx-core = "1.16.0"
-robovm = "1.0.0"
-icu4j = "77.1"
 jackson = "2.19.2"
 kotlinpoet = "2.2.0"
 
@@ -27,8 +25,6 @@ coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", ve
 serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "browser" }
 androidx-core = { module = "androidx.core:core", version.ref = "androidx-core" }
-robovm = { module = "org.robovm:robovm-rt", version.ref = "robovm" }
-icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
 jackson-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
