@@ -19,7 +19,7 @@ String resources generation in Kotlin Multiplatform.
 
 buildscript {
     dependencies {
-        classpath("io.github.skeptick.libres:gradle-plugin:2.0.0-alpha01")
+        classpath("io.github.skeptick.libres:gradle-plugin:2.0.0-alpha02")
     }
 }
 ```
