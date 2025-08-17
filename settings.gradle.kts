@@ -2,12 +2,20 @@
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
+pluginManagement {
+    includeBuild("plural-rules-generator")
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+
 dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven(url = "https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 
-include(":libres-core", ":libres-compose", ":gradle-plugin")
+include(":libres-core", ":libres-plural-rules", ":libres-compose", ":gradle-plugin")

@@ -1,8 +1,15 @@
 @file:Suppress("UnstableApiUsage")
 
-dependencyResolutionManagement {
+pluginManagement {
     repositories {
         gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
         google()
         mavenCentral()
     }

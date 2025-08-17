@@ -5,6 +5,7 @@ plugin-publish-maven = "0.34.0"
 kotlin = "2.2.0"
 compose-jb = "1.8.2"
 coroutines = "1.10.2"
+serialization = "1.9.0"
 browser = "0.4"
 androidx-core = "1.16.0"
 robovm = "1.0.0"
@@ -20,8 +21,10 @@ plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.
 plugin-publish-maven = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "plugin-publish-maven" }
 plugin-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-jb" }
 plugin-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
+plugin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "browser" }
 androidx-core = { module = "androidx.core:core", version.ref = "androidx-core" }
 robovm = { module = "org.robovm:robovm-rt", version.ref = "robovm" }
@@ -30,4 +33,5 @@ jackson-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xm
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 
-junit = { module = "junit:junit", version.ref = "junit" }
+test-kotlin-core = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+test-junit = { module = "junit:junit", version.ref = "junit" }
