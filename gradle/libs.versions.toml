@@ -2,7 +2,7 @@
 plugin-android = "8.10.0"
 plugin-publish-maven = "0.34.0"
 
-kotlin = "2.2.0"
+kotlin = "2.2.10"
 compose-jb = "1.8.2"
 coroutines = "1.10.2"
 serialization = "1.9.0"
