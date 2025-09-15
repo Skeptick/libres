@@ -1,5 +1,6 @@
 package io.github.skeptick.libres.plugin
 
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryExtension
 import io.github.skeptick.libres.VERSION
 import com.android.build.gradle.BaseExtension
 import org.gradle.api.Plugin
@@ -10,6 +11,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.SourceSet
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.sources.DefaultKotlinSourceSet
 
@@ -31,26 +33,15 @@ class ResourcesPlugin : Plugin<Project> {
             }
         }
 
-        val androidPluginHandler = { _: Plugin<*> ->
+        project.plugins.withId("com.android.base") {
             isAndroid = true
             setupTasks(true)
         }
 
-        project.plugins.withId("com.android.application", androidPluginHandler)
-        project.plugins.withId("com.android.library", androidPluginHandler)
-        project.plugins.withId("com.android.instantapp", androidPluginHandler)
-        project.plugins.withId("com.android.feature", androidPluginHandler)
-        project.plugins.withId("com.android.dynamic-feature", androidPluginHandler)
-
-        val kotlinPluginHandler = { _: Plugin<*> ->
+        project.plugins.withType(KotlinBasePlugin::class.java) {
             isKotlin = true
             setupTasks(false)
         }
-
-        project.plugins.withId("org.jetbrains.kotlin.multiplatform", kotlinPluginHandler)
-        project.plugins.withId("org.jetbrains.kotlin.android", kotlinPluginHandler)
-        project.plugins.withId("org.jetbrains.kotlin.jvm", kotlinPluginHandler)
-        project.plugins.withId("org.jetbrains.kotlin.js", kotlinPluginHandler)
     }
 
     private fun Project.setDependencies() {
@@ -70,7 +61,8 @@ class ResourcesPlugin : Plugin<Project> {
     private fun Project.registerGeneratorsTasks() {
         val kotlinExtension = project.extensions.getByType(KotlinProjectExtension::class.java)
         val kotlinMultiplatformExtension = project.extensions.findByType(KotlinMultiplatformExtension::class.java)
-        val androidExtension = project.extensions.findByName("android") as BaseExtension?
+        val kotlinAndroidExtension = kotlinMultiplatformExtension?.extensions?.findByType(KotlinMultiplatformAndroidLibraryExtension::class.java)
+        val androidExtension = project.extensions.findByType(BaseExtension::class.java)
 
         val inputDirectory: Provider<Directory>
         val outputDirectory: Provider<Directory>
@@ -98,7 +90,10 @@ class ResourcesPlugin : Plugin<Project> {
             }
         }
 
-        val stringsOutputPackageName = listOfNotNull(androidExtension?.namespace, "strings").joinToString(".")
+        val outputPackageName = pluginExtension.generatedClassPackageNameProp.convention(
+            androidExtension?.namespace ?: kotlinAndroidExtension?.namespace ?: DEFAULT_RESOURCES_PACKAGE_NAME
+        )
+        val stringsOutputPackageName = outputPackageName.map { packageName -> "$packageName.strings" }
 
         val stringsTask = tasks.register(GENERATE_STRINGS_TASK_NAME, LibresStringGenerationTask::class.java) { task ->
             val stringsInputDirectory = inputDirectory.map { it.dir("strings") }
@@ -122,10 +117,10 @@ class ResourcesPlugin : Plugin<Project> {
 
         val resourcesTask = tasks.register(GENERATE_RESOURCES_TASK_NAME, LibresResourcesGenerationTask::class.java) { task ->
             task.group = TASK_GROUP
-            task.outputPackageName.set(androidExtension?.namespace.orEmpty())
+            task.outputPackageName.set(outputPackageName)
             task.outputClassName.set(pluginExtension.generatedClassNameProp)
             task.stringsOutputPackageName.set(stringsOutputPackageName)
-            task.outputDirectory.set(outputDirectory.toOutputDirectory(androidExtension?.namespace.orEmpty()))
+            task.outputDirectory.set(outputDirectory.toOutputDirectory(outputPackageName))
             task.dependsOn(stringsTask)
         }
 
@@ -136,15 +131,22 @@ class ResourcesPlugin : Plugin<Project> {
 
     companion object {
 
+        private const val DEFAULT_RESOURCES_PACKAGE_NAME = "libres.resources"
+
         private const val LIBRARY_PACKAGE_NAME = "io.github.skeptick.libres"
+
         internal const val STRINGS_PACKAGE_NAME = "$LIBRARY_PACKAGE_NAME.strings"
 
         private const val TASK_GROUP = "libres"
+
         const val GENERATE_RESOURCES_TASK_NAME = "libresGenerateResources"
+
         const val GENERATE_STRINGS_TASK_NAME = "libresGenerateStrings"
 
-        private fun Provider<Directory>.toOutputDirectory(packageName: String) =
-            map { it.dir(packageName.replace('.', '/')) }
+        private fun Provider<Directory>.toOutputDirectory(packageName: Provider<String>) =
+            zip(packageName) { directory, packageName ->
+                directory.dir(packageName.replace('.', '/'))
+            }
 
     }
 

@@ -15,9 +15,15 @@ abstract class ResourcesPluginExtension @Inject constructor(objects: ObjectFacto
 
     internal val camelCaseNamesForAppleFrameworkProp = objects.property(Boolean::class.java).convention(false)
 
+    internal val generatedClassPackageNameProp = objects.property(String::class.java)
+
     var generatedClassName: String
         get() = generatedClassNameProp.get()
         set(value) = generatedClassNameProp.set(value)
+
+    var generatedClassPackageName: String?
+        get() = generatedClassPackageNameProp.orNull
+        set(value) = generatedClassPackageNameProp.set(value)
 
     var generateNamedArguments: Boolean
         get() = generateNamedArgumentsProp.get()
@@ -35,6 +41,10 @@ abstract class ResourcesPluginExtension @Inject constructor(objects: ObjectFacto
         generatedClassNameProp.set(provider)
     }
 
+    fun setGeneratedClassPackageName(provider: Provider<String>) {
+        generatedClassPackageNameProp.set(provider)
+    }
+
     fun setGenerateNamedArguments(provider: Provider<Boolean>) {
         generateNamedArgumentsProp.set(provider)
     }
@@ -49,6 +59,7 @@ abstract class ResourcesPluginExtension @Inject constructor(objects: ObjectFacto
 
     internal fun finalizeValuesOnRead() {
         generatedClassNameProp.finalizeValueOnRead()
+        generatedClassPackageNameProp.finalizeValueOnRead()
         generateNamedArgumentsProp.finalizeValueOnRead()
         baseLocaleLanguageCodeProp.finalizeValueOnRead()
         camelCaseNamesForAppleFrameworkProp.finalizeValueOnRead()
