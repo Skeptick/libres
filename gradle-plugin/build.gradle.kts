@@ -19,6 +19,7 @@ dependencies {
     compileOnly(libs.plugin.kotlin)
     compileOnly(libs.plugin.android)
     testImplementation(libs.test.junit)
+    testImplementation(libs.test.kotlin.core)
 }
 
 gradlePlugin {

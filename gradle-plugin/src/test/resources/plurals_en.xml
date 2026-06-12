@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="format_days">
+        <item quantity="one">${count} day</item>
+        <item quantity="other">${count} days</item>
+    </plurals>
+    <plurals name="screen_status_cargo_tribbles">
+        <item quantity="one">${count} cute, furry tribble.</item>
+        <item quantity="other">${count} cute, furry tribbles.</item>
+    </plurals>
+</resources>

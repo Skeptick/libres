@@ -3,6 +3,8 @@
 package io.github.skeptick.libres.plugin.strings
 
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.LIST
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
 import io.github.skeptick.libres.plugin.common.declarations.saveTo
@@ -31,11 +33,16 @@ internal class StringTypeSpecsBuilder(
         val baseParameters = baseResource.parameters
         val formattedResource = baseResource.replaceParameters(baseParameters, baseLanguageCode)
         val type = baseResource.fetchClass(outputPackageName, baseParameters.isNotEmpty(), generateNamedArguments)
+        val propertyType = if (baseResource is StringArrayResource) {
+            LIST.parameterizedBy(type)
+        } else {
+            type
+        }
 
         baseResource.appendLocalizedResources(localizedResources, type)
-        stringsInterface.addTextResourceToInterface(resourceName, type)
-        baseLocalizedObject.addTextResourceToLocalizedObject(resourceName, formattedResource, type, baseLanguageCode)
-        stringObject.addTextResourceToStringsObject(resourceName, type, camelCaseForApple)
+        stringsInterface.addTextResourceToInterface(resourceName, propertyType)
+        baseLocalizedObject.addTextResourceToLocalizedObject(resourceName, formattedResource, type, baseLanguageCode, propertyType)
+        stringObject.addTextResourceToStringsObject(resourceName, propertyType, camelCaseForApple)
         if (generateNamedArguments && baseParameters.isNotEmpty()) customClasses += CustomFormattedTextResourceClass(type, baseResource)
     }
 
@@ -63,7 +70,7 @@ internal class StringTypeSpecsBuilder(
 
 private fun TextResource.fetchClass(packageName: String, hasParameters: Boolean, generateNamedArguments: Boolean) =
     when (this) {
-        is StringResource -> when {
+        is StringResource, is StringArrayResource -> when {
             !hasParameters -> String::class.asTypeName()
             generateNamedArguments -> ClassName(packageName, "LibresFormat" + name.snakeCaseToCamelCase())
             else -> VoidFormattedString::class.asTypeName()
@@ -82,6 +89,15 @@ private fun TextResource.replaceParameters(parameters: Set<String>, languageCode
                 val actualIndex = parameters.indexOf(argument)
                 if (actualIndex != -1) $$"%$${actualIndex + 1}$s"
                 else throw ParameterNotFoundException(languageCode, name, argument)
+            }
+        )
+        is StringArrayResource -> copy(
+            items = items.map {
+                it.replaceNamedArguments { _, argument ->
+                    val actualIndex = parameters.indexOf(argument)
+                    if (actualIndex != -1) "%${actualIndex + 1}\$s"
+                    else throw ParameterNotFoundException(languageCode, name, argument)
+                }
             }
         )
         is PluralsResource -> copy(

@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.*
 import io.github.skeptick.libres.plugin.common.declarations.addObjCNameAnnotation
 import io.github.skeptick.libres.plugin.strings.models.LanguageCode
 import io.github.skeptick.libres.plugin.strings.models.PluralsResource
+import io.github.skeptick.libres.plugin.strings.models.StringArrayResource
 import io.github.skeptick.libres.plugin.strings.models.StringResource
 import io.github.skeptick.libres.plugin.strings.models.TextResource
 import io.github.skeptick.libres.plugin.strings.snakeCaseToCamelCase
@@ -16,7 +17,7 @@ import io.github.skeptick.libres.strings.getCurrentLanguageCode
  */
 internal fun TypeSpec.Builder.addTextResourceToInterface(
     name: String,
-    type: ClassName
+    type: TypeName,
 ): TypeSpec.Builder {
     return addProperty(
         PropertySpec.builder(name, type.copy(nullable = true)).build()
@@ -31,10 +32,11 @@ internal fun TypeSpec.Builder.addTextResourceToLocalizedObject(
     name: String,
     resource: TextResource?,
     type: ClassName,
-    languageCode: LanguageCode
+    languageCode: LanguageCode,
+    propertyType: TypeName = type
 ): TypeSpec.Builder {
     return addProperty(
-        PropertySpec.builder(name, type.copy(nullable = resource == null))
+        PropertySpec.builder(name, propertyType.copy(nullable = resource == null))
             .addModifiers(KModifier.OVERRIDE)
             .apply {
                 when (resource) {
@@ -43,6 +45,35 @@ internal fun TypeSpec.Builder.addTextResourceToLocalizedObject(
                         "String" -> initializer("%S", resource.value.unescapeXml())
                         else -> initializer("%L(%S)", type.simpleName, resource.value.unescapeXml())
                     }
+
+                    is StringArrayResource -> when (type.simpleName) {
+                        "String" -> initializer(
+                            "%L",
+                            CodeBlock.builder()
+                                .add("listOf")
+                                .add("(")
+                                .apply {
+                                    for (item in resource.items)
+                                        add("%S, ", item.unescapeXml())
+                                }
+                                .add(")")
+                                .build()
+                        )
+
+                        else -> initializer(
+                            "%L",
+                            CodeBlock.builder()
+                                .add("listOf")
+                                .add("(")
+                                .apply {
+                                    for (item in resource.items)
+                                        add("%L(%S), ", type, item.unescapeXml())
+                                }
+                                .add(")")
+                                .build()
+                        )
+                    }
+
                     else -> initializer("null")
                 }
             }.build()
@@ -55,7 +86,7 @@ internal fun TypeSpec.Builder.addTextResourceToLocalizedObject(
  */
 internal fun TypeSpec.Builder.addTextResourceToStringsObject(
     name: String,
-    type: ClassName,
+    type: TypeName,
     camelCaseForApple: Boolean
 ): TypeSpec.Builder {
     return addProperty(

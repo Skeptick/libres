@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="headline_capitalist">
+        <item>Editorial: Taxes Too High!</item>
+        <item>Market Indices Read Record Levels!</item>
+        <item>Corporate Profits Up!</item>
+        <item>Restrictions on Corporate Freedom Abolished by Courts!</item>
+    </string-array>
+    <string-array name="headline_communist">
+        <item>Party Reports Productivity Increase.</item>
+        <item>Counter-Revolutionary Bureaucrats Purged from Party!</item>
+        <item>Party: Bold New Future for ${system}!</item>
+        <item>Politburo Approves New 5-Year Plan!</item>
+    </string-array>
+    <string-array name="headline_remote">
+        <item>Reports of ${event} in the ${system} System.</item>
+        <item>News of ${event} in the ${system} System.</item>
+        <item>New Rumors of ${event} in the ${system} System.</item>
+        <item>Sources say ${event} in the ${system} System.</item>
+        <item>Notice: ${event} in the ${system} System.</item>
+        <item>Evidence Suggests ${event} in the ${system} System.</item>
+    </string-array>
+</resources>

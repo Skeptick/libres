@@ -8,6 +8,7 @@ import io.github.skeptick.libres.plugin.common.declarations.addExperimentalObjCN
 import io.github.skeptick.libres.plugin.strings.capitalizeUS
 import io.github.skeptick.libres.plugin.strings.models.LanguageCode
 import io.github.skeptick.libres.plugin.strings.models.PluralsResource
+import io.github.skeptick.libres.plugin.strings.models.StringArrayResource
 import io.github.skeptick.libres.plugin.strings.models.StringResource
 import io.github.skeptick.libres.plugin.strings.models.TextResource
 import io.github.skeptick.libres.plugin.strings.snakeCaseToCamelCase
@@ -71,6 +72,7 @@ internal fun EmptyStringObject(name: String): TypeSpec.Builder {
 internal fun CustomFormattedTextResourceClass(type: ClassName, resource: TextResource): TypeSpec.Builder {
     return when (resource) {
         is StringResource -> CustomFormattedStringClass(type, resource)
+        is StringArrayResource -> CustomFormattedStringArrayClass(type, resource)
         is PluralsResource -> CustomFormattedPluralStringClass(type, resource)
     }
 }
@@ -84,6 +86,10 @@ internal fun CustomFormattedTextResourceClass(type: ClassName, resource: TextRes
  */
 private fun CustomFormattedStringClass(type: ClassName, resource: StringResource): TypeSpec.Builder {
     val parameters = resource.parameters.map { it.snakeCaseToCamelCase(startWithLower = true) }.toSet()
+    return CustomFormattedStringClass(type, parameters)
+}
+
+private fun CustomFormattedStringClass(type: ClassName, parameters: Set<String>): TypeSpec.Builder {
     return TypeSpec.classBuilder(type.simpleName)
         .primaryConstructor(
             FunSpec.constructorBuilder().addParameter("value", String::class).build()
@@ -96,6 +102,15 @@ private fun CustomFormattedStringClass(type: ClassName, resource: StringResource
                 .addStatement("return %L(value, arrayOf(%L))", ::formatString.name, parameters.joinToString(","))
                 .build()
         )
+}
+
+/*
+ * The same as CustomFormattedStringClass, but makes sure it has the parameters from all strings in the array.
+ */
+private fun CustomFormattedStringArrayClass(type: ClassName, resource: StringArrayResource): TypeSpec.Builder {
+    val parameters = resource.parameters.map { it.snakeCaseToCamelCase(startWithLower = true) }.toSet()
+
+    return CustomFormattedStringClass(type, parameters)
 }
 
 /*

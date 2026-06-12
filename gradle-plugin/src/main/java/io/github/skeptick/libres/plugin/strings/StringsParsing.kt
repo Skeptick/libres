@@ -30,9 +30,11 @@ private fun Resources.validateDuplicatesAndArguments() {
     forEach { (languageCode, localizedResources) ->
         val names = localizedResources.map(TextResource::name)
         val stringValues = localizedResources.filterIsInstance<StringResource>().map(StringResource::value)
+        val stringArrayValues = localizedResources.filterIsInstance<StringArrayResource>().flatMap { it.items }
         val pluralValues = localizedResources.filterIsInstance<PluralsResource>().flatMap { it.items.map(PluralsResource.Item::value) }
         names.findDuplicates().let { if (it.isNotEmpty()) throw NamesClashException(languageCode, it) }
         stringValues.find(String::hasJavaArguments)?.let { throw UnavailableFormatException(languageCode, it) }
+        stringArrayValues.find(String::hasJavaArguments)?.let { throw UnavailableFormatException(languageCode, it) }
         pluralValues.find(String::hasJavaArguments)?.let { throw UnavailableFormatException(languageCode, it) }
     }
 }
@@ -42,8 +44,8 @@ class UnavailableNameException internal constructor(name: String) : Exception(
 )
 
 class NamesClashException internal constructor(languageCode: LanguageCode, names: Set<String>) : Exception(
-    "Found strings with the identical names: $names. Locale: '$languageCode'."
-)
+        "Found strings with the identical names: $names. Locale: '$languageCode'."
+    )
 
 class UnavailableFormatException internal constructor(languageCode: LanguageCode, stringName: String) : Exception(
     "Don't use java style formatting. Use \${template_like}. Locale: '$languageCode'. String: '$stringName'."
@@ -67,6 +69,7 @@ class InvalidPluralQuantityException internal constructor(quantity: String) : Ex
 
 private fun JsonNode.parseResources(): List<TextResource> {
     return this["string"]?.parseAsArray(JsonNode::parseString).orEmpty() +
+            this["string-array"]?.parseAsArray(JsonNode::parseStringArray).orEmpty() +
             this["plurals"]?.parseAsArray(JsonNode::parsePlural).orEmpty()
 }
 
@@ -74,6 +77,13 @@ private fun JsonNode.parseString(): StringResource {
     return StringResource(
         name = this["name"].asText(),
         value = this[""]?.asText() ?: ""
+    )
+}
+
+private fun JsonNode.parseStringArray(): StringArrayResource {
+    return StringArrayResource(
+        name = this["name"].asText(),
+        items = this["item"]?.parseAsArray { it.asText() }.orEmpty()
     )
 }
 

@@ -6,9 +6,9 @@ import com.android.build.gradle.BaseExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
@@ -65,27 +65,27 @@ class ResourcesPlugin : Plugin<Project> {
         val androidExtension = project.extensions.findByType(BaseExtension::class.java)
 
         val inputDirectory: Provider<Directory>
-        val outputDirectory: Provider<Directory>
-        val sourceSetRegistrator: (Provider<DirectoryProperty>) -> Unit
+        val baseOutputDirectory: Provider<Directory>
+        val sourceSetRegistrator: (TaskProvider<*>) -> Unit
 
         when {
             kotlinMultiplatformExtension != null -> {
                 val commonSourceSet = kotlinMultiplatformExtension.sourceSets.getByName(KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME)
                 inputDirectory = layout.projectDirectory.dir(provider { "src/${commonSourceSet.name}/libres" })
-                outputDirectory = layout.buildDirectory.dir("generated/libres/common/src")
+                baseOutputDirectory = layout.buildDirectory.dir("generated/libres/common/src")
                 sourceSetRegistrator = { commonSourceSet.kotlin.srcDir(it) }
             }
             androidExtension != null -> {
                 val androidMainSourceSet = androidExtension.sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
                 inputDirectory = layout.projectDirectory.dir(provider { "src/${androidMainSourceSet.name}/libres" })
-                outputDirectory = layout.buildDirectory.dir("generated/libres/android/src")
+                baseOutputDirectory = layout.buildDirectory.dir("generated/libres/android/src")
                 sourceSetRegistrator = { androidMainSourceSet.kotlin.srcDir(it) }
             }
             else -> {
                 val target = kotlinExtension.targets.firstOrNull { it.platform != null } ?: return
                 val defaultSourceSet = target.compilations.firstOrNull { it.isMainCompilation }?.defaultSourceSet ?: return
                 inputDirectory = layout.projectDirectory.dir(provider { "src/${defaultSourceSet.name}/libres" })
-                outputDirectory = layout.buildDirectory.dir("generated/libres/${target.platform?.name?.lowercase() ?: "default"}/src")
+                baseOutputDirectory = layout.buildDirectory.dir("generated/libres/${target.platform?.name?.lowercase() ?: "default"}/src")
                 sourceSetRegistrator = { defaultSourceSet.kotlin.srcDir(it) }
             }
         }
@@ -112,7 +112,7 @@ class ResourcesPlugin : Plugin<Project> {
                     directory.asFileTree.matching { pattern -> pattern.include("**/*.xml") }
                 }
             )
-            task.outputDirectory.set(outputDirectory.toOutputDirectory(stringsOutputPackageName))
+            task.outputDirectory.set(baseOutputDirectory.map { it.dir("strings") })
         }
 
         val resourcesTask = tasks.register(GENERATE_RESOURCES_TASK_NAME, LibresResourcesGenerationTask::class.java) { task ->
@@ -120,13 +120,13 @@ class ResourcesPlugin : Plugin<Project> {
             task.outputPackageName.set(outputPackageName)
             task.outputClassName.set(pluginExtension.generatedClassNameProp)
             task.stringsOutputPackageName.set(stringsOutputPackageName)
-            task.outputDirectory.set(outputDirectory.toOutputDirectory(outputPackageName))
+            task.outputDirectory.set(baseOutputDirectory.map { it.dir("resources") })
             task.dependsOn(stringsTask)
         }
 
         pluginExtension.finalizeValuesOnRead()
-        sourceSetRegistrator(stringsTask.map { it.outputDirectory })
-        sourceSetRegistrator(resourcesTask.map { it.outputDirectory })
+        sourceSetRegistrator(stringsTask)
+        sourceSetRegistrator(resourcesTask)
     }
 
     companion object {
@@ -142,11 +142,6 @@ class ResourcesPlugin : Plugin<Project> {
         const val GENERATE_RESOURCES_TASK_NAME = "libresGenerateResources"
 
         const val GENERATE_STRINGS_TASK_NAME = "libresGenerateStrings"
-
-        private fun Provider<Directory>.toOutputDirectory(packageName: Provider<String>) =
-            zip(packageName) { directory, packageName ->
-                directory.dir(packageName.replace('.', '/'))
-            }
 
     }
 
