@@ -4,13 +4,12 @@ plugin-publish-maven = "0.37.0"
 
 android-compileSdk = "37"
 android-targetSdk = "37"
-android-minSdk = "16"
+android-minSdk = "21"
 
 kotlin = "2.4.0"
 coroutines = "1.11.0"
 serialization = "1.11.0"
 browser = "0.5.0"
-androidx-core = "1.19.0"
 jackson = "2.22.0"
 kotlinpoet = "2.3.0"
 
@@ -27,7 +26,6 @@ plugin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", v
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "browser" }
-androidx-core = { module = "androidx.core:core", version.ref = "androidx-core" }
 jackson-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }

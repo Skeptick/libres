@@ -20,12 +20,6 @@ kotlin {
             }
         }
 
-        androidMain {
-            dependencies {
-                implementation(libs.androidx.core)
-            }
-        }
-
         wasmJsMain {
             dependencies {
                 implementation(libs.browser)
