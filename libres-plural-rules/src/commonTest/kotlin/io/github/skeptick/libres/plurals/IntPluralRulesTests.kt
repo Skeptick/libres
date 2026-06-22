@@ -986,6 +986,33 @@ class IntPluralRulesTests {
     }
 
     @Test
+    fun testCvPluralForm() {
+        assertEquals(PluralForm.Zero, IntPluralRules.getPluralForm("cv", 0))
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("cv", 1))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 2))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 3))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 4))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 5))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 6))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 7))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 8))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 9))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 10))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 11))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 12))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 13))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 14))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 15))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 16))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 17))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 100))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 1000))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 10000))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 100000))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("cv", 1000000))
+    }
+
+    @Test
     fun testCyPluralForm() {
         assertEquals(PluralForm.Zero, IntPluralRules.getPluralForm("cy", 0))
         assertEquals(PluralForm.One, IntPluralRules.getPluralForm("cy", 1))
@@ -2195,6 +2222,32 @@ class IntPluralRulesTests {
     }
 
     @Test
+    fun testIePluralForm() {
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("ie", 1))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 0))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 2))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 3))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 4))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 5))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 6))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 7))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 8))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 9))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 10))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 11))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 12))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 13))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 14))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 15))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 16))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 100))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 1000))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 10000))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 100000))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ie", 1000000))
+    }
+
+    @Test
     fun testIgPluralForm() {
         assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ig", 0))
         assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ig", 1))
@@ -2818,6 +2871,33 @@ class IntPluralRulesTests {
         assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ko", 10000))
         assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ko", 100000))
         assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("ko", 1000000))
+    }
+
+    @Test
+    fun testKokPluralForm() {
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("kok", 0))
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("kok", 1))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 2))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 3))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 4))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 5))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 6))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 7))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 8))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 9))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 10))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 11))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 12))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 13))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 14))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 15))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 16))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 17))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 100))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 1000))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 10000))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 100000))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("kok", 1000000))
     }
 
     @Test
@@ -4822,6 +4902,60 @@ class IntPluralRulesTests {
         assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sg", 10000))
         assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sg", 100000))
         assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sg", 1000000))
+    }
+
+    @Test
+    fun testSgsPluralForm() {
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("sgs", 1))
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("sgs", 21))
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("sgs", 31))
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("sgs", 41))
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("sgs", 51))
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("sgs", 61))
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("sgs", 71))
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("sgs", 81))
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("sgs", 101))
+        assertEquals(PluralForm.One, IntPluralRules.getPluralForm("sgs", 1001))
+        assertEquals(PluralForm.Two, IntPluralRules.getPluralForm("sgs", 2))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 3))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 4))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 5))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 6))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 7))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 8))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 9))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 22))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 23))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 24))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 25))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 26))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 27))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 28))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 29))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 32))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 102))
+        assertEquals(PluralForm.Few, IntPluralRules.getPluralForm("sgs", 1002))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 0))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 10))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 11))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 12))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 13))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 14))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 15))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 16))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 17))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 18))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 19))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 20))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 30))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 40))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 50))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 60))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 100))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 1000))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 10000))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 100000))
+        assertEquals(PluralForm.Other, IntPluralRules.getPluralForm("sgs", 1000000))
     }
 
     @Test

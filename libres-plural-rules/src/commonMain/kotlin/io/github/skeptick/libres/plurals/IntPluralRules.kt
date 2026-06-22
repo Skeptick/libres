@@ -39,6 +39,7 @@ public object IntPluralRules {
         "ckb" -> getCkbPluralForm(number)
         "cs" -> getCsPluralForm(number)
         "csw" -> getCswPluralForm(number)
+        "cv" -> getCvPluralForm(number)
         "cy" -> getCyPluralForm(number)
         "da" -> getDaPluralForm(number)
         "de" -> getDePluralForm(number)
@@ -79,6 +80,7 @@ public object IntPluralRules {
         "hy" -> getHyPluralForm(number)
         "ia" -> getIaPluralForm(number)
         "id" -> getIdPluralForm(number)
+        "ie" -> getIePluralForm(number)
         "ig" -> getIgPluralForm(number)
         "ii" -> getIiPluralForm(number)
         "io" -> getIoPluralForm(number)
@@ -103,6 +105,7 @@ public object IntPluralRules {
         "km" -> getKmPluralForm(number)
         "kn" -> getKnPluralForm(number)
         "ko" -> getKoPluralForm(number)
+        "kok" -> getKokPluralForm(number)
         "ks" -> getKsPluralForm(number)
         "ksb" -> getKsbPluralForm(number)
         "ksh" -> getKshPluralForm(number)
@@ -171,6 +174,7 @@ public object IntPluralRules {
         "seh" -> getSehPluralForm(number)
         "ses" -> getSesPluralForm(number)
         "sg" -> getSgPluralForm(number)
+        "sgs" -> getSgsPluralForm(number)
         "sh" -> getShPluralForm(number)
         "shi" -> getShiPluralForm(number)
         "si" -> getSiPluralForm(number)
@@ -489,6 +493,15 @@ public object IntPluralRules {
         val abs = kotlin.math.abs(number)
         return when {
             abs in 0..1 -> PluralForm.One
+            else -> PluralForm.Other
+        }
+    }
+
+    private fun getCvPluralForm(number: Int): PluralForm {
+        val abs = kotlin.math.abs(number)
+        return when {
+            abs == 0 -> PluralForm.Zero
+            abs == 1 -> PluralForm.One
             else -> PluralForm.Other
         }
     }
@@ -823,6 +836,14 @@ public object IntPluralRules {
 
     private fun getIdPluralForm(number: Int): PluralForm = PluralForm.Other
 
+    private fun getIePluralForm(number: Int): PluralForm {
+        val abs = kotlin.math.abs(number)
+        return when {
+            abs == 1 -> PluralForm.One
+            else -> PluralForm.Other
+        }
+    }
+
     private fun getIgPluralForm(number: Int): PluralForm = PluralForm.Other
 
     private fun getIiPluralForm(number: Int): PluralForm = PluralForm.Other
@@ -959,6 +980,14 @@ public object IntPluralRules {
     }
 
     private fun getKoPluralForm(number: Int): PluralForm = PluralForm.Other
+
+    private fun getKokPluralForm(number: Int): PluralForm {
+        val abs = kotlin.math.abs(number)
+        return when {
+            abs == 0 || abs == 1 -> PluralForm.One
+            else -> PluralForm.Other
+        }
+    }
 
     private fun getKsPluralForm(number: Int): PluralForm {
         val abs = kotlin.math.abs(number)
@@ -1495,6 +1524,18 @@ public object IntPluralRules {
     private fun getSesPluralForm(number: Int): PluralForm = PluralForm.Other
 
     private fun getSgPluralForm(number: Int): PluralForm = PluralForm.Other
+
+    private fun getSgsPluralForm(number: Int): PluralForm {
+        val abs = kotlin.math.abs(number)
+        val mod10 = abs % 10
+        val mod100 = abs % 100
+        return when {
+            mod10 == 1 && mod100 != 11 -> PluralForm.One
+            abs == 2 -> PluralForm.Two
+            mod10 in 2..9 && mod100 !in 11..19 -> PluralForm.Few
+            else -> PluralForm.Other
+        }
+    }
 
     private fun getShPluralForm(number: Int): PluralForm {
         val abs = kotlin.math.abs(number)
