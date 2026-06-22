@@ -7,7 +7,6 @@ android-targetSdk = "37"
 android-minSdk = "16"
 
 kotlin = "2.4.0"
-compose-jb = "1.11.1"
 coroutines = "1.11.0"
 serialization = "1.11.0"
 browser = "0.5.0"
@@ -25,7 +24,6 @@ plugin-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", versi
 plugin-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 plugin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 
-compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-jb" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "browser" }

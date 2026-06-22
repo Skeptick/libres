@@ -11,8 +11,6 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-@file:Suppress("UnstableApiUsage")
-
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 dependencyResolutionManagement {
@@ -22,4 +20,4 @@ dependencyResolutionManagement {
     }
 }
 
-include(":libres-core", ":libres-plural-rules", ":libres-compose", ":gradle-plugin")
+include(":libres-core", ":libres-plural-rules", ":gradle-plugin")
