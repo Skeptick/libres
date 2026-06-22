@@ -20,22 +20,46 @@ kotlin {
     // JVM
     jvm()
 
-    // JS
-    js {
-        browser()
-    }
-
-    // WasmJS
-    wasmJs {
-        browser()
-    }
-
     // iOS
     iosArm64()
     iosSimulatorArm64()
 
+    // watchOS
+    watchosArm32()
+    watchosArm64()
+    watchosSimulatorArm64()
+
+    // tvOS
+    tvosArm64()
+    tvosSimulatorArm64()
+
     // MacOS
     macosArm64()
+
+    // Linux
+    linuxX64()
+    linuxArm64()
+
+    // Windows
+    mingwX64()
+
+    // JavaScript
+    js {
+        browser()
+        nodejs()
+    }
+
+    // WASM JS
+    wasmJs {
+        browser()
+        nodejs()
+        d8()
+    }
+
+    // WASM WASI
+    wasmWasi {
+        nodejs()
+    }
 
     compilerOptions {
         freeCompilerArgs.addAll(

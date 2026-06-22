@@ -10,9 +10,6 @@ kotlin {
         namespace = "io.github.skeptick.libres"
     }
 
-    tvosSimulatorArm64()
-    tvosArm64()
-
     sourceSets {
         commonMain {
             dependencies {
