@@ -1,24 +1,23 @@
 plugins {
     id("multiplatform-setup")
-    id("android-setup-plugin")
     id("com.vanniktech.maven.publish")
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-android {
-    namespace = "io.github.skeptick.libres.compose"
-}
-
 kotlin {
     applyDefaultHierarchyTemplate()
+
+    android {
+        namespace = "io.github.skeptick.libres.compose"
+    }
 
     sourceSets {
         commonMain {
             dependencies {
                 api(projects.libresCore)
                 implementation(libs.coroutines.core)
-                implementation(compose.ui)
+                implementation(libs.compose.ui)
             }
         }
     }

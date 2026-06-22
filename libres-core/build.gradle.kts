@@ -1,19 +1,17 @@
 plugins {
     id("multiplatform-setup")
-    id("android-setup-plugin")
     id("com.vanniktech.maven.publish")
 }
 
-android {
-    namespace = "io.github.skeptick.libres"
-}
-
 kotlin {
-    tvosX64()
+    applyDefaultHierarchyTemplate()
+
+    android {
+        namespace = "io.github.skeptick.libres"
+    }
+
     tvosSimulatorArm64()
     tvosArm64()
-
-    applyDefaultHierarchyTemplate()
 
     sourceSets {
         commonMain {

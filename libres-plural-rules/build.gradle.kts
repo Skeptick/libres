@@ -2,43 +2,33 @@
 
 plugins {
     kotlin("multiplatform")
-    id("android-setup-plugin")
+    id("com.android.kotlin.multiplatform.library")
     id("com.vanniktech.maven.publish")
     id("io.github.skeptick.libres.plurals")
 }
 
 kotlin {
-    metadata {
-        compilations.all {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    freeCompilerArgs.add("-Xexplicit-api=strict")
-                }
-            }
-        }
-    }
-
     // Android
-    androidTarget {
-        publishLibraryVariants("release")
+    android {
+        namespace = "io.github.skeptick.libres.plurals"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        packaging.resources.excludes.add("META-INF/*.kotlin_module")
     }
 
     // JVM
     jvm()
 
     // iOS
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
 
     // watchOS
-    watchosX64()
     watchosArm32()
     watchosArm64()
     watchosSimulatorArm64()
 
     // tvOS
-    tvosX64()
     tvosArm64()
     tvosSimulatorArm64()
 
@@ -50,7 +40,6 @@ kotlin {
     mingwX64()
 
     // MacOS
-    macosX64()
     macosArm64()
 
     // JavaScript
@@ -71,6 +60,16 @@ kotlin {
         nodejs()
     }
 
+    metadata {
+        compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions {
+                    freeCompilerArgs.add("-Xexplicit-api=strict")
+                }
+            }
+        }
+    }
+
     sourceSets {
         commonTest {
             dependencies {
@@ -80,10 +79,6 @@ kotlin {
     }
 
     jvmToolchain(17)
-}
-
-android {
-    namespace = "io.github.skeptick.libres.plurals"
 }
 
 pluralRulesGenerator {

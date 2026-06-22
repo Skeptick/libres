@@ -1,15 +1,19 @@
 [versions]
-plugin-android = "8.10.0"
-plugin-publish-maven = "0.34.0"
+plugin-android = "9.2.1"
+plugin-publish-maven = "0.37.0"
 
-kotlin = "2.2.10"
-compose-jb = "1.8.2"
-coroutines = "1.10.2"
-serialization = "1.9.0"
-browser = "0.4"
-androidx-core = "1.16.0"
-jackson = "2.19.2"
-kotlinpoet = "2.2.0"
+android-compileSdk = "37"
+android-targetSdk = "37"
+android-minSdk = "16"
+
+kotlin = "2.4.0"
+compose-jb = "1.11.1"
+coroutines = "1.11.0"
+serialization = "1.11.0"
+browser = "0.5.0"
+androidx-core = "1.19.0"
+jackson = "2.22.0"
+kotlinpoet = "2.3.0"
 
 junit = "4.13.2"
 
@@ -21,6 +25,7 @@ plugin-compose = { module = "org.jetbrains.compose:compose-gradle-plugin", versi
 plugin-composeCompiler = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
 plugin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-jb" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "browser" }
