@@ -38,7 +38,7 @@ public actual fun getPlatformDefaultLibresLocale(): LibresLocale? {
 private fun Intl.Locale.asLibresLocale(): LibresLocale {
     return LibresLocale(
         language = language,
-        script = script,
-        region = region
+        script = script?.ifEmpty { null },
+        region = region?.ifEmpty { null }
     )
 }

@@ -16,11 +16,5 @@ kotlin {
                 implementation(projects.libresPluralRules)
             }
         }
-
-        wasmJsMain {
-            dependencies {
-                implementation(libs.browser)
-            }
-        }
     }
 }
