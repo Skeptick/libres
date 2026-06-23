@@ -1,5 +1,3 @@
-@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
-
 plugins {
     id("multiplatform-setup")
     id("com.vanniktech.maven.publish")

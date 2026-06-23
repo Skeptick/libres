@@ -8,7 +8,7 @@ android-minSdk = "21"
 
 kotlin = "2.4.0"
 serialization = "1.11.0"
-jackson = "2.22.0"
+xmlutil = "1.0.0-rc3"
 kotlinpoet = "2.3.0"
 
 junit = "4.13.2"
@@ -20,8 +20,7 @@ plugin-publish-maven = { module = "com.vanniktech:gradle-maven-publish-plugin", 
 plugin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 
 serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
-jackson-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
-jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+xmlutil = { module = "io.github.pdvrieze.xmlutil:serialization", version.ref = "xmlutil" }
 kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 
 test-kotlin-core = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

@@ -1,33 +1,36 @@
 package io.github.skeptick.libres.plugin
 
-import io.github.skeptick.libres.plugin.common.declarations.saveTo
-import io.github.skeptick.libres.plugin.common.extensions.deleteFiles
+import io.github.skeptick.libres.plugin.common.saveTo
+import io.github.skeptick.libres.plugin.declarations.StringsCommonObject
+import io.github.skeptick.libres.plugin.declarations.StringsEmptyObject
+import io.github.skeptick.libres.plugin.declarations.StringsFormatClasses
+import io.github.skeptick.libres.plugin.declarations.StringsInterface
+import io.github.skeptick.libres.plugin.declarations.StringsLocalizedObject
+import io.github.skeptick.libres.plugin.models.LocaleTag
+import io.github.skeptick.libres.plugin.models.ResourcesSettings
+import io.github.skeptick.libres.plugin.models.TextResource
+import io.github.skeptick.libres.plugin.models.parseLocaleTag
+import io.github.skeptick.libres.plugin.parsing.parseStrings
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.*
-import io.github.skeptick.libres.plugin.strings.*
-import io.github.skeptick.libres.plugin.strings.declarations.*
-import io.github.skeptick.libres.plugin.strings.models.*
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.provider.Property
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.IgnoreEmptyDirectories
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.TaskAction
+import java.io.File
+import javax.inject.Inject
 
 @CacheableTask
-abstract class LibresStringGenerationTask : DefaultTask() {
+abstract class LibresStringGenerationTask @Inject constructor(objects: ObjectFactory) : DefaultTask() {
 
-    @get:Input
-    internal abstract val outputPackageName: Property<String>
-
-    @get:Input
-    internal abstract val outputClassName: Property<String>
-
-    @get:Input
-    internal abstract val baseLocaleLanguageCode: Property<String>
-
-    @get:Input
-    internal abstract val generateNamedArguments: Property<Boolean>
-
-    @get:Input
-    internal abstract val camelCaseNamesForAppleFramework: Property<Boolean>
+    @get:Nested
+    internal val settings: ResourcesSettingsInput = objects.newInstance(ResourcesSettingsInput::class.java)
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -39,54 +42,42 @@ abstract class LibresStringGenerationTask : DefaultTask() {
 
     @TaskAction
     fun apply() {
+        val resourcesSettings = settings.toSettings()
+
         if (inputFiles.isEmpty) {
-            buildEmptyResources()
+            buildEmptyResources(resourcesSettings)
         } else {
-            val stringResources = parseStringResources(
-                inputFiles = inputFiles.files,
-                baseLocaleLanguageCode = baseLocaleLanguageCode.get()
-            )
-            if (stringResources.getValue(baseLocaleLanguageCode.get()).isNotEmpty()) {
-                buildResources(stringResources)
+            val localeTags = inputFiles.files.map(File::parseLocaleTag).toSet()
+            val stringResources = parseStrings(inputFiles.files, resourcesSettings.baseLocaleTag)
+            if (stringResources.isNotEmpty()) {
+                buildResources(settings = resourcesSettings, resources = stringResources, localeTags = localeTags)
             } else {
-                buildEmptyResources()
+                buildEmptyResources(resourcesSettings)
             }
         }
     }
 
-    private fun buildResources(resources: Map<LanguageCode, List<TextResource>>) {
-        val builder = StringTypeSpecsBuilder(
-            outputPackageName = outputPackageName.get(),
-            outputClassName = outputClassName.get(),
-            languageCodes = resources.keys,
-            baseLanguageCode = baseLocaleLanguageCode.get(),
-            generateNamedArguments = generateNamedArguments.get(),
-            camelCaseForApple = camelCaseNamesForAppleFramework.get()
-        )
-        val resourceByLanguageCodes = resources.mapValues { it.value.associateBy(TextResource::name) }
-
-        resources.getValue(baseLocaleLanguageCode.get()).forEach { baseResource ->
-            builder.appendResource(
-                baseResource = baseResource,
-                localizedResources = resources.mapValues {
-                    resourceByLanguageCodes[it.key]?.get(baseResource.name)
-                }
-            )
-        }
+    private fun buildEmptyResources(settings: ResourcesSettings) {
+        val stringObject = StringsEmptyObject(settings)
 
         outputDirectory.get().let { outputDir ->
-            outputDir.deleteFiles()
-            builder.save(outputDir)
+            outputDir.asFile.listFiles().forEach { if (it.isFile) it.delete() }
+            stringObject.saveTo(outputDir)
         }
     }
 
-    private fun buildEmptyResources() {
-        val stringObjectTypeSpec = EmptyStringObject(outputClassName.get())
-        val stringsFileSpec = StringsObjectFile(outputPackageName.get(), stringObjectTypeSpec)
+    private fun buildResources(settings: ResourcesSettings, resources: List<TextResource>, localeTags: Set<LocaleTag>) {
+        val stringsInterface = StringsInterface(settings, resources)
+        val stringsFormatClasses = StringsFormatClasses(settings, resources)
+        val stringsLocalizedObjects = localeTags.map { localeTag -> StringsLocalizedObject(settings, localeTag, resources) }
+        val stringsCommonObject = StringsCommonObject(settings, localeTags, resources)
 
         outputDirectory.get().let { outputDir ->
-            outputDir.deleteFiles()
-            stringsFileSpec.saveTo(outputDir)
+            outputDir.asFile.listFiles().forEach { if (it.isFile) it.delete() }
+            stringsInterface.saveTo(outputDir)
+            stringsFormatClasses.saveTo(outputDir)
+            stringsLocalizedObjects.forEach { it.saveTo(outputDir) }
+            stringsCommonObject.saveTo(outputDir)
         }
     }
 

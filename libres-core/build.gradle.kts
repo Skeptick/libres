@@ -16,5 +16,10 @@ kotlin {
                 implementation(projects.libresPluralRules)
             }
         }
+        commonTest {
+            dependencies {
+                implementation(libs.test.kotlin.core)
+            }
+        }
     }
 }

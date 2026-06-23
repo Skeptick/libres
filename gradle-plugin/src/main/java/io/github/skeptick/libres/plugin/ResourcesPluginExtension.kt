@@ -1,7 +1,11 @@
 package io.github.skeptick.libres.plugin
 
+import io.github.skeptick.libres.plugin.models.LocaleTag
+import io.github.skeptick.libres.plugin.models.ResourcesSettings
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import javax.inject.Inject
 
 @Suppress("unused")
@@ -11,7 +15,7 @@ abstract class ResourcesPluginExtension @Inject constructor(objects: ObjectFacto
 
     internal val generateNamedArgumentsProp = objects.property(Boolean::class.java).convention(false)
 
-    internal val baseLocaleLanguageCodeProp = objects.property(String::class.java).convention("en")
+    internal val baseLocaleTagProp = objects.property(String::class.java).convention("en")
 
     internal val camelCaseNamesForAppleFrameworkProp = objects.property(Boolean::class.java).convention(false)
 
@@ -29,9 +33,9 @@ abstract class ResourcesPluginExtension @Inject constructor(objects: ObjectFacto
         get() = generateNamedArgumentsProp.get()
         set(value) = generateNamedArgumentsProp.set(value)
 
-    var baseLocaleLanguageCode: String
-        get() = baseLocaleLanguageCodeProp.get()
-        set(value) = baseLocaleLanguageCodeProp.set(value)
+    var baseLocaleTag: String
+        get() = baseLocaleTagProp.get()
+        set(value) = baseLocaleTagProp.set(value)
 
     var camelCaseNamesForAppleFramework: Boolean
         get() = camelCaseNamesForAppleFrameworkProp.get()
@@ -49,8 +53,8 @@ abstract class ResourcesPluginExtension @Inject constructor(objects: ObjectFacto
         generateNamedArgumentsProp.set(provider)
     }
 
-    fun setBaseLocaleLanguageCode(provider: Provider<String>) {
-        baseLocaleLanguageCodeProp.set(provider)
+    fun setBaseLocaleTag(provider: Provider<String>) {
+        baseLocaleTagProp.set(provider)
     }
 
     fun setCamelCaseNamesForAppleFrameworkProp(provider: Provider<Boolean>) {
@@ -61,8 +65,37 @@ abstract class ResourcesPluginExtension @Inject constructor(objects: ObjectFacto
         generatedClassNameProp.finalizeValueOnRead()
         generatedClassPackageNameProp.finalizeValueOnRead()
         generateNamedArgumentsProp.finalizeValueOnRead()
-        baseLocaleLanguageCodeProp.finalizeValueOnRead()
+        baseLocaleTagProp.finalizeValueOnRead()
         camelCaseNamesForAppleFrameworkProp.finalizeValueOnRead()
+    }
+
+}
+
+internal open class ResourcesSettingsInput @Inject constructor(objects: ObjectFactory) {
+
+    @get:Input
+    internal val resourcesName: Property<String> = objects.property(String::class.java)
+
+    @get:Input
+    internal val packageName: Property<String> = objects.property(String::class.java)
+
+    @get:Input
+    internal val generateNamedArguments: Property<Boolean> = objects.property(Boolean::class.java)
+
+    @get:Input
+    internal val camelCaseForApple: Property<Boolean> = objects.property(Boolean::class.java)
+
+    @get:Input
+    internal val baseLocaleTag: Property<String> = objects.property(String::class.java)
+
+    internal fun toSettings(): ResourcesSettings {
+        return ResourcesSettings(
+            resourcesName = resourcesName.get(),
+            packageName = packageName.get(),
+            generateNamedArguments = generateNamedArguments.get(),
+            camelCaseForApple = camelCaseForApple.get(),
+            baseLocaleTag = LocaleTag(baseLocaleTag.get())
+        )
     }
 
 }

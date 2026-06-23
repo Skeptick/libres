@@ -1,20 +1,28 @@
 plugins {
+    `java-gradle-plugin`
     kotlin("jvm")
-    id("java-gradle-plugin")
     id("com.vanniktech.maven.publish")
+    kotlin("plugin.serialization")
 }
 
 version = property("VERSION_NAME").toString()
 
 kotlin {
+    sourceSets {
+        all {
+            languageSettings.apply {
+                optIn("io.github.skeptick.libres.InternalLibresApi")
+            }
+        }
+    }
+
     jvmToolchain(17)
 }
 
 dependencies {
     implementation(projects.libresCore)
     implementation(gradleApi())
-    implementation(libs.jackson.xml)
-    implementation(libs.jackson.kotlin)
+    implementation(libs.xmlutil)
     implementation(libs.kotlinpoet)
     compileOnly(libs.plugin.kotlin)
     compileOnly(libs.plugin.android)
