@@ -7,7 +7,7 @@ import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asClassName
 import io.github.skeptick.libres.plugin.parsing.InvalidParametersException
-import io.github.skeptick.libres.plugin.common.extractInterpolationParameters
+import io.github.skeptick.libres.plugin.common.extractTemplateParameters
 import io.github.skeptick.libres.plugin.common.replaceTemplateParameters
 import io.github.skeptick.libres.plugin.common.snakeCaseToCamelCase
 import io.github.skeptick.libres.strings.VoidFormattedPluralString
@@ -20,7 +20,7 @@ internal sealed interface TextResource {
 }
 
 internal fun TextResource.replaceParametersToJavaSpecifiers(value: String, locale: LocaleTag): String {
-    val actualParameters = value.extractInterpolationParameters().toSet()
+    val actualParameters = value.extractTemplateParameters().toSet()
     if (!parameters.containsAll(actualParameters)) {
         throw InvalidParametersException(
             localeTag = locale,

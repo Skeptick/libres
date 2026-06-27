@@ -8,8 +8,5 @@ internal data class ResourcesSettings(
     val camelCaseForApple: Boolean,
     val baseLocaleTag: LocaleTag
 ) {
-
-    val stringsPackageName: String
-        get() = "$packageName.strings"
-
+    val stringsPackageName: String = "$packageName.strings"
 }

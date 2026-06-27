@@ -1,6 +1,6 @@
 package io.github.skeptick.libres.plugin.models
 
-import io.github.skeptick.libres.plugin.common.extractInterpolationParameters
+import io.github.skeptick.libres.plugin.common.extractTemplateParameters
 
 internal class PluralsResource(
     override val name: String,
@@ -8,7 +8,7 @@ internal class PluralsResource(
     localizedItems: Map<LocaleTag, List<Item>>
 ) : TextResource {
 
-    override val parameters: Set<String> = baseItems.flatMap { it.value.extractInterpolationParameters() }.toSet()
+    override val parameters: Set<String> = baseItems.flatMap { it.value.extractTemplateParameters() }.toSet()
 
     val localizedItems: Map<LocaleTag, List<Item>> = localizedItems.mapValues { (locale, items) ->
         items.map { item ->

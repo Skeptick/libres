@@ -53,6 +53,20 @@ class StringResourceInvalidFormatException internal constructor(
     }
 )
 
+class InvalidTemplateParameterNameException internal constructor(
+    localeTag: LocaleTag,
+    resourceName: String,
+    invalidParameters: Set<String>
+) : Exception(
+    buildString {
+        appendLine("String resource contains invalid template parameter names.")
+        appendLine("Locale: ${localeTag.value}")
+        appendLine("Resource: $resourceName")
+        appendLine("Invalid parameters: $invalidParameters")
+        appendLine("Allowed format: start with a Latin letter and use only Latin letters, digits, and underscores.")
+    }
+)
+
 class DifferentStringResourceTypesException internal constructor(
     resourceName: String
 ) : Exception(
