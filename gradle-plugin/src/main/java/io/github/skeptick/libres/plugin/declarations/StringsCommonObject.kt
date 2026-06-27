@@ -66,13 +66,13 @@ internal fun StringsCommonObject(
                 .addModifiers(if (settings.generateInternalClasses) KModifier.INTERNAL else KModifier.PUBLIC)
                 .applyIf(settings.camelCaseForApple) { addAnnotation(ExperimentalObjCNameAnnotation) }
                 .addProperty(
-                    PropertySpec.builder("baseLocale", ClassName(settings.stringsPackageName, baseLocaleClassName))
+                    PropertySpec.builder("_baseLocale", ClassName(settings.stringsPackageName, baseLocaleClassName))
                         .addModifiers(KModifier.PRIVATE)
                         .initializer(baseLocaleClassName)
                         .build()
                 )
                 .addProperty(
-                    PropertySpec.builder("localizations", localizationsClass)
+                    PropertySpec.builder("_localizations", localizationsClass)
                         .addModifiers(KModifier.PRIVATE)
                         .initializer(localeTags.toLocalizationsCodeBlock())
                         .build()
@@ -126,8 +126,8 @@ private fun Set<LocaleTag>.toLocalizationsCodeBlock(): CodeBlock {
  */
 private fun TextResource.toGetterCodeBlock(): CodeBlock {
     return buildCodeBlock {
-        add("return localizations.current?.%M { it.%L }", firstNotNullOfOrNull, name)
-        add(" ?: baseLocale.%L", name)
+        add("return _localizations.current?.%M { it.%N }", firstNotNullOfOrNull, name)
+        add(" ?: _baseLocale.%N", name)
     }
 }
 

@@ -2,6 +2,7 @@
 
 package io.github.skeptick.libres.plugin.declarations
 
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.INT
@@ -12,6 +13,8 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.buildCodeBlock
+import com.squareup.kotlinpoet.joinToCode
 import io.github.skeptick.libres.plugin.models.PluralsResource
 import io.github.skeptick.libres.plugin.models.ResourcesSettings
 import io.github.skeptick.libres.plugin.models.StringResource
@@ -63,18 +66,18 @@ private fun CustomFormatStringClass(
         .addModifiers(if (settings.generateInternalClasses) KModifier.INTERNAL else KModifier.PUBLIC)
         .primaryConstructor(
             FunSpec.constructorBuilder()
-                .addParameter("value", STRING)
+                .addParameter("_value", STRING)
                 .build()
         ).addProperty(
-            PropertySpec.builder("value", STRING)
-                .initializer("value")
+            PropertySpec.builder("_value", STRING)
+                .initializer("_value")
                 .addModifiers(KModifier.PRIVATE)
                 .build()
         ).addFunction(
             FunSpec.builder("format")
                 .addParameters(parameters.map { ParameterSpec.builder(it, STRING).build() })
                 .returns(STRING)
-                .addStatement("return %M(value, arrayOf(%L))", formatString, parameters.joinToString(", "))
+                .addStatement("return %M(_value, arrayOf(%L))", formatString, parameters.toParametersCodeBlock())
                 .build()
         ).build()
 }
@@ -98,17 +101,17 @@ private fun CustomFormatPluralStringClass(
         .addModifiers(if (settings.generateInternalClasses) KModifier.INTERNAL else KModifier.PUBLIC)
         .primaryConstructor(
             FunSpec.constructorBuilder()
-                .addParameter("forms", PluralForms::class.asClassName())
-                .addParameter("languageCode", STRING)
+                .addParameter("_forms", PluralForms::class.asClassName())
+                .addParameter("_languageCode", STRING)
                 .build()
         ).addProperty(
-            PropertySpec.builder("forms", PluralForms::class.asClassName())
-                .initializer("forms")
+            PropertySpec.builder("_forms", PluralForms::class.asClassName())
+                .initializer("_forms")
                 .addModifiers(KModifier.PRIVATE)
                 .build()
         ).addProperty(
-            PropertySpec.builder("languageCode", STRING)
-                .initializer("languageCode")
+            PropertySpec.builder("_languageCode", STRING)
+                .initializer("_languageCode")
                 .addModifiers(KModifier.PRIVATE)
                 .build()
         ).addFunction(
@@ -117,11 +120,19 @@ private fun CustomFormatPluralStringClass(
                 .addParameters(parameters.map { ParameterSpec.builder(it, STRING).build() })
                 .returns(STRING)
                 .addStatement(
-                    "return %M(%M(forms, languageCode, number), arrayOf(%L))",
+                    "return %M(%M(_forms, _languageCode, number), arrayOf(%L))",
                     formatString,
                     getPluralizedString,
-                    parameters.joinToString(", ")
+                    parameters.toParametersCodeBlock()
                 )
                 .build()
         ).build()
+}
+
+private fun List<String>.toParametersCodeBlock(): CodeBlock {
+    return joinToCode(separator = ", ") { parameter ->
+        buildCodeBlock {
+            add("%N", parameter)
+        }
+    }
 }
