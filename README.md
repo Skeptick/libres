@@ -50,9 +50,8 @@ plugins {
 libres {
     generatedClassName = "MainRes"
     generateNamedArguments = true
+    generateInternalResourceClasses = true
     baseLocaleTag = "en"
-    generatedClassPackageName = "com.example.application"
-    camelCaseNamesForAppleFramework = false
 }
 ```
 
@@ -63,6 +62,7 @@ libres {
 | `generatedClassName`              | `"Res"`                                                                           | Name of the generated root object.                                                                                                                                                                       |
 | `generatedClassPackageName`       | Android namespace, or `"libres.resources"` when no Android namespace is available | Package for the generated root object.                                                                                                                                                                   |
 | `generateNamedArguments`          | `false`                                                                           | When `true`, resources with template parameters get generated formatter classes with named `format(...)` arguments. When `false`, formatted resources use generic `format(vararg args: String)` helpers. |
+| `generateInternalResourceClasses` | `false`                                                                           | When `true`, generated resource classes use `internal` visibility instead of `public`.                                                                                                                   |
 | `baseLocaleTag`                   | `"en"`                                                                            | Locale that must contain every resource and acts as the final fallback.                                                                                                                                  |
 | `camelCaseNamesForAppleFramework` | `false`                                                                           | Adds Swift/Objective-C camelCase names for generated string properties. Kotlin property names stay unchanged.                                                                                            |
 

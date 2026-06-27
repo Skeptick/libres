@@ -34,12 +34,11 @@ internal fun StringsFormatClasses(
 ): FileSpec {
     return FileSpec.builder(settings.stringsPackageName, "FormatClasses")
         .addTypes(resources.mapNotNull { resource ->
-            val className = resource.className(settings)
             when {
                 resource.parameters.isEmpty() -> null
                 else -> when (resource) {
-                    is StringResource -> CustomFormatStringClass(className, resource)
-                    is PluralsResource -> CustomFormatPluralStringClass(className, resource)
+                    is StringResource -> CustomFormatStringClass(settings, resource)
+                    is PluralsResource -> CustomFormatPluralStringClass(settings, resource)
                 }
             }
         })
@@ -56,11 +55,12 @@ internal fun StringsFormatClasses(
  * ```
  */
 private fun CustomFormatStringClass(
-    className: ClassName,
+    settings: ResourcesSettings,
     resource: StringResource
 ): TypeSpec {
     val parameters = resource.parameters.map { it.snakeCaseToCamelCase(startWithLower = true) }
-    return TypeSpec.classBuilder(className)
+    return TypeSpec.classBuilder(resource.className(settings))
+        .addModifiers(if (settings.generateInternalClasses) KModifier.INTERNAL else KModifier.PUBLIC)
         .primaryConstructor(
             FunSpec.constructorBuilder()
                 .addParameter("value", STRING)
@@ -90,11 +90,12 @@ private fun CustomFormatStringClass(
  * ```
  */
 private fun CustomFormatPluralStringClass(
-    className: ClassName,
+    settings: ResourcesSettings,
     resource: PluralsResource
 ): TypeSpec {
     val parameters = resource.parameters.map { it.snakeCaseToCamelCase(startWithLower = true) }
-    return TypeSpec.classBuilder(className)
+    return TypeSpec.classBuilder(resource.className(settings))
+        .addModifiers(if (settings.generateInternalClasses) KModifier.INTERNAL else KModifier.PUBLIC)
         .primaryConstructor(
             FunSpec.constructorBuilder()
                 .addParameter("forms", PluralForms::class.asClassName())

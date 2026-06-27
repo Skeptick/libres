@@ -122,6 +122,7 @@ class ResourcesPlugin : Plugin<Project> {
         resourcesName.set(pluginExtension.generatedClassNameProp)
         packageName.set(outputPackageName)
         generateNamedArguments.set(pluginExtension.generateNamedArgumentsProp)
+        generateInternalResourceClasses.set(pluginExtension.generateInternalResourceClassesProp)
         camelCaseForApple.set(pluginExtension.camelCaseNamesForAppleFrameworkProp)
         baseLocaleTag.set(pluginExtension.baseLocaleTagProp)
     }

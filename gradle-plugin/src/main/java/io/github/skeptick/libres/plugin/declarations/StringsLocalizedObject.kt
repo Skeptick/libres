@@ -22,13 +22,13 @@ import io.github.skeptick.libres.strings.PluralForms
 
 /**
  * ```
- * public object StringsEn : Strings {
+ * internal object StringsEn : Strings {
  *
- *   public val simple_string: String = "Hello!"
+ *   override val simple_string: String = "Hello!"
  *
- *   public val format_string: LibresFormatFormatString = LibresFormatFormatString("Hello, %1\$s!")
+ *   override val format_string: LibresFormatFormatString = LibresFormatFormatString("Hello, %1\$s!")
  *
- *   public val plural_string: LibresFormatPluralString = LibresFormatPluralString(
+ *   override val plural_string: LibresFormatPluralString = LibresFormatPluralString(
  *     PluralForms(one = "%1\$s resource", other = "%1\$s resources"), "en"
  *   )
  *
@@ -44,6 +44,7 @@ internal fun StringsLocalizedObject(
     return FileSpec.builder(settings.stringsPackageName, className)
         .addType(
             TypeSpec.objectBuilder(className)
+                .addModifiers(KModifier.INTERNAL)
                 .addSuperinterface(ClassName(settings.stringsPackageName, "Strings"))
                 .addProperties(resources.map { resource ->
                     val className = resource.className(settings)

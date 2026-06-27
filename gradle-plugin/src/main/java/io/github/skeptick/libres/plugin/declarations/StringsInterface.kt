@@ -3,6 +3,7 @@
 package io.github.skeptick.libres.plugin.declarations
 
 import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import io.github.skeptick.libres.plugin.models.ResourcesSettings
@@ -29,6 +30,7 @@ internal fun StringsInterface(
     return FileSpec.builder(settings.stringsPackageName, "Strings")
         .addType(
             TypeSpec.interfaceBuilder("Strings")
+                .addModifiers(if (settings.generateInternalClasses) KModifier.INTERNAL else KModifier.PUBLIC)
                 .addProperties(resources.map {
                     PropertySpec.builder(it.name, it.className(settings).copy(nullable = true)).build()
                 })

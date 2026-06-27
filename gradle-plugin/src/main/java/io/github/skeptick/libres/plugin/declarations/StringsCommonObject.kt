@@ -63,6 +63,7 @@ internal fun StringsCommonObject(
         .addAnnotation(InternalLibresApiAnnotation)
         .addType(
             TypeSpec.objectBuilder(className)
+                .addModifiers(if (settings.generateInternalClasses) KModifier.INTERNAL else KModifier.PUBLIC)
                 .applyIf(settings.camelCaseForApple) { addAnnotation(ExperimentalObjCNameAnnotation) }
                 .addProperty(
                     PropertySpec.builder("baseLocale", ClassName(settings.stringsPackageName, baseLocaleClassName))

@@ -4,6 +4,7 @@ internal data class ResourcesSettings(
     val resourcesName: String,
     val packageName: String,
     val generateNamedArguments: Boolean,
+    val generateInternalClasses: Boolean,
     val camelCaseForApple: Boolean,
     val baseLocaleTag: LocaleTag
 ) {

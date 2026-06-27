@@ -13,13 +13,15 @@ abstract class ResourcesPluginExtension @Inject constructor(objects: ObjectFacto
 
     internal val generatedClassNameProp = objects.property(String::class.java).convention("Res")
 
+    internal val generatedClassPackageNameProp = objects.property(String::class.java)
+
     internal val generateNamedArgumentsProp = objects.property(Boolean::class.java).convention(false)
+
+    internal val generateInternalResourceClassesProp = objects.property(Boolean::class.java).convention(false)
 
     internal val baseLocaleTagProp = objects.property(String::class.java).convention("en")
 
     internal val camelCaseNamesForAppleFrameworkProp = objects.property(Boolean::class.java).convention(false)
-
-    internal val generatedClassPackageNameProp = objects.property(String::class.java)
 
     var generatedClassName: String
         get() = generatedClassNameProp.get()
@@ -32,6 +34,10 @@ abstract class ResourcesPluginExtension @Inject constructor(objects: ObjectFacto
     var generateNamedArguments: Boolean
         get() = generateNamedArgumentsProp.get()
         set(value) = generateNamedArgumentsProp.set(value)
+
+    var generateInternalResourceClasses: Boolean
+        get() = generateInternalResourceClassesProp.get()
+        set(value) = generateInternalResourceClassesProp.set(value)
 
     var baseLocaleTag: String
         get() = baseLocaleTagProp.get()
@@ -51,6 +57,10 @@ abstract class ResourcesPluginExtension @Inject constructor(objects: ObjectFacto
 
     fun setGenerateNamedArguments(provider: Provider<Boolean>) {
         generateNamedArgumentsProp.set(provider)
+    }
+
+    fun setGenerateInternalResourceClasses(provider: Provider<Boolean>) {
+        generateInternalResourceClassesProp.set(provider)
     }
 
     fun setBaseLocaleTag(provider: Provider<String>) {
@@ -83,6 +93,9 @@ internal open class ResourcesSettingsInput @Inject constructor(objects: ObjectFa
     internal val generateNamedArguments: Property<Boolean> = objects.property(Boolean::class.java)
 
     @get:Input
+    internal val generateInternalResourceClasses: Property<Boolean> = objects.property(Boolean::class.java)
+
+    @get:Input
     internal val camelCaseForApple: Property<Boolean> = objects.property(Boolean::class.java)
 
     @get:Input
@@ -93,6 +106,7 @@ internal open class ResourcesSettingsInput @Inject constructor(objects: ObjectFa
             resourcesName = resourcesName.get(),
             packageName = packageName.get(),
             generateNamedArguments = generateNamedArguments.get(),
+            generateInternalClasses = generateInternalResourceClasses.get(),
             camelCaseForApple = camelCaseForApple.get(),
             baseLocaleTag = LocaleTag(baseLocaleTag.get())
         )
