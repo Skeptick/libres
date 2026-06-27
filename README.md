@@ -119,6 +119,12 @@ String files use an Android-like `<resources>` structure:
         <item quantity="one">${count} resource</item>
         <item quantity="other">${count} resources</item>
     </plurals>
+    <string-array name="planets">
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Earth</item>
+        <item>Mars</item>
+    </string-array>
 </resources>
 ```
 
@@ -126,6 +132,7 @@ Supported resource tags:
 
 - `<string name="...">...</string>`
 - `<plurals name="...">...</plurals>` with `zero`, `one`, `two`, `few`, `many`, or `other` quantity items
+- `<string-array name="...">...</string-array>`
 
 ### Locale File Names
 

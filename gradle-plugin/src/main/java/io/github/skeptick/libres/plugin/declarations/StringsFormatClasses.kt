@@ -2,7 +2,6 @@
 
 package io.github.skeptick.libres.plugin.declarations
 
-import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.INT
@@ -19,6 +18,7 @@ import io.github.skeptick.libres.plugin.models.StringResource
 import io.github.skeptick.libres.plugin.models.TextResource
 import io.github.skeptick.libres.plugin.models.className
 import io.github.skeptick.libres.plugin.common.snakeCaseToCamelCase
+import io.github.skeptick.libres.plugin.models.ArrayResource
 import io.github.skeptick.libres.strings.PluralForms
 import io.github.skeptick.libres.strings.VoidFormattedString
 import io.github.skeptick.libres.strings.formatString
@@ -37,7 +37,7 @@ internal fun StringsFormatClasses(
             when {
                 resource.parameters.isEmpty() -> null
                 else -> when (resource) {
-                    is StringResource -> CustomFormatStringClass(settings, resource)
+                    is StringResource, is ArrayResource -> CustomFormatStringClass(settings, resource)
                     is PluralsResource -> CustomFormatPluralStringClass(settings, resource)
                 }
             }
@@ -56,7 +56,7 @@ internal fun StringsFormatClasses(
  */
 private fun CustomFormatStringClass(
     settings: ResourcesSettings,
-    resource: StringResource
+    resource: TextResource
 ): TypeSpec {
     val parameters = resource.parameters.map { it.snakeCaseToCamelCase(startWithLower = true) }
     return TypeSpec.classBuilder(resource.className(settings))

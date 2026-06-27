@@ -1,12 +1,14 @@
 package io.github.skeptick.libres.plugin.parsing
 
 import io.github.skeptick.libres.plugin.common.allAre
+import io.github.skeptick.libres.plugin.models.ArrayResource
 import io.github.skeptick.libres.plugin.models.LocaleTag
 import io.github.skeptick.libres.plugin.models.PluralsResource
 import io.github.skeptick.libres.plugin.models.PluralsResource.Companion.quantityBySerialName
 import io.github.skeptick.libres.plugin.models.StringResource
 import io.github.skeptick.libres.plugin.models.TextResource
 import io.github.skeptick.libres.plugin.models.parseLocaleTag
+import io.github.skeptick.libres.plugin.parsing.StringsXmlItem.ArrayItem
 import io.github.skeptick.libres.plugin.parsing.StringsXmlItem.PluralsItem
 import io.github.skeptick.libres.plugin.parsing.StringsXmlItem.StringItem
 import nl.adaptivity.xmlutil.serialization.XML
@@ -21,6 +23,7 @@ internal fun parseStrings(inputFiles: Set<File>, baseLocaleTag: LocaleTag): List
         when {
             itemsByLocale.allAre<LocaleTag, StringItem>() -> itemsByLocale.buildStringResource(name, baseLocaleTag)
             itemsByLocale.allAre<LocaleTag, PluralsItem>() -> itemsByLocale.buildPluralsResource(name, baseLocaleTag)
+            itemsByLocale.allAre<LocaleTag, ArrayItem>() -> itemsByLocale.buildArrayResource(name, baseLocaleTag)
             else -> throw DifferentStringResourceTypesException(name)
         }
     }
@@ -68,6 +71,18 @@ private fun Map<LocaleTag, PluralsItem>.buildPluralsResource(name: String, baseL
     )
 }
 
+private fun Map<LocaleTag, ArrayItem>.buildArrayResource(name: String, baseLocaleTag: LocaleTag): ArrayResource {
+    requireBaseLocale(name, baseLocaleTag)
+    requireNoJavaSpecifiers(name)
+
+    val localizedItems = mapValues { (_, item) -> item.items.map(ArrayItem.Item::value) }
+    return ArrayResource(
+        name = name,
+        baseItems = localizedItems.getValue(baseLocaleTag),
+        localizedItems = localizedItems
+    )
+}
+
 private fun <T> Map<LocaleTag, T>.requireBaseLocale(name: String, baseLocaleTag: LocaleTag) {
     if (baseLocaleTag !in this) {
         throw BaseStringResourcesNotFoundException(name, baseLocaleTag, keys.toList())
@@ -97,5 +112,6 @@ private fun StringsXmlItem.hasJavaSpecifiers(): Boolean {
     return when (this) {
         is StringItem -> value.contains(JavaSpecifiersRegex)
         is PluralsItem -> items.any { it.value.contains(JavaSpecifiersRegex) }
+        is ArrayItem -> items.any { it.value.contains(JavaSpecifiersRegex) }
     }
 }

@@ -43,4 +43,20 @@ internal sealed interface StringsXmlItem {
 
     }
 
+    @Serializable
+    @SerialName("string-array")
+    @XmlSerialName("string-array")
+    data class ArrayItem(
+        @XmlElement(false) override val name: String,
+        @XmlPolyChildren(["item"]) val items: List<Item> = emptyList(),
+    ) : StringsXmlItem {
+
+        @Serializable
+        @XmlSerialName("item")
+        data class Item(
+            @XmlValue val value: String = "",
+        )
+
+    }
+
 }

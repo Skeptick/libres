@@ -59,7 +59,7 @@ class DifferentStringResourceTypesException internal constructor(
     buildString {
         appendLine("String resource has inconsistent XML item types across locales.")
         appendLine("Resource: $resourceName")
-        appendLine("Expected type: use either <string> or <plurals> consistently.")
+        appendLine("Expected type: use either <string>, <plurals> or <string-array> consistently.")
     }
 )
 

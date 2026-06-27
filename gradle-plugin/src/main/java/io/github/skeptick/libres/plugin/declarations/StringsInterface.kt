@@ -8,7 +8,7 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import io.github.skeptick.libres.plugin.models.ResourcesSettings
 import io.github.skeptick.libres.plugin.models.TextResource
-import io.github.skeptick.libres.plugin.models.className
+import io.github.skeptick.libres.plugin.models.typeName
 
 /**
  * ```
@@ -32,7 +32,7 @@ internal fun StringsInterface(
             TypeSpec.interfaceBuilder("Strings")
                 .addModifiers(if (settings.generateInternalClasses) KModifier.INTERNAL else KModifier.PUBLIC)
                 .addProperties(resources.map {
-                    PropertySpec.builder(it.name, it.className(settings).copy(nullable = true)).build()
+                    PropertySpec.builder(it.name, it.typeName(settings).copy(nullable = true)).build()
                 })
                 .build()
         )

@@ -19,8 +19,8 @@ import io.github.skeptick.libres.LibresLocalizations
 import io.github.skeptick.libres.plugin.models.LocaleTag
 import io.github.skeptick.libres.plugin.models.ResourcesSettings
 import io.github.skeptick.libres.plugin.models.TextResource
-import io.github.skeptick.libres.plugin.models.className
 import io.github.skeptick.libres.plugin.common.snakeCaseToCamelCase
+import io.github.skeptick.libres.plugin.models.typeName
 
 private val firstNotNullOfOrNull = MemberName("kotlin.collections", "firstNotNullOfOrNull")
 
@@ -78,7 +78,7 @@ internal fun StringsCommonObject(
                         .build()
                 )
                 .addProperties(resources.map { resource ->
-                    PropertySpec.builder(resource.name, resource.className(settings))
+                    PropertySpec.builder(resource.name, resource.typeName(settings))
                         .applyIf(settings.camelCaseForApple) {
                             val customName = resource.name.snakeCaseToCamelCase(startWithLower = true)
                             addAnnotation(ObjCNameAnnotation(customName))

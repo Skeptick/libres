@@ -12,12 +12,14 @@ import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.buildCodeBlock
 import com.squareup.kotlinpoet.joinToCode
+import io.github.skeptick.libres.plugin.models.ArrayResource
 import io.github.skeptick.libres.plugin.models.LocaleTag
 import io.github.skeptick.libres.plugin.models.PluralsResource
 import io.github.skeptick.libres.plugin.models.ResourcesSettings
 import io.github.skeptick.libres.plugin.models.StringResource
 import io.github.skeptick.libres.plugin.models.TextResource
 import io.github.skeptick.libres.plugin.models.className
+import io.github.skeptick.libres.plugin.models.typeName
 import io.github.skeptick.libres.strings.PluralForms
 
 /**
@@ -47,11 +49,10 @@ internal fun StringsLocalizedObject(
                 .addModifiers(KModifier.INTERNAL)
                 .addSuperinterface(ClassName(settings.stringsPackageName, "Strings"))
                 .addProperties(resources.map { resource ->
-                    val className = resource.className(settings)
                     val nullable = !resource.existForLocale(localeTag)
-                    PropertySpec.builder(resource.name, className.copy(nullable = nullable))
+                    PropertySpec.builder(resource.name, resource.typeName(settings).copy(nullable = nullable))
                         .addModifiers(KModifier.OVERRIDE)
-                        .resourceInitializer(resource, className, localeTag)
+                        .resourceInitializer(resource, resource.className(settings), localeTag)
                         .build()
                 })
                 .build()
@@ -63,6 +64,7 @@ private fun TextResource.existForLocale(localeTag: LocaleTag): Boolean {
     return when (this) {
         is StringResource -> localizedValues.containsKey(localeTag)
         is PluralsResource -> localizedItems.containsKey(localeTag)
+        is ArrayResource -> localizedItems.containsKey(localeTag)
     }
 }
 
@@ -81,6 +83,11 @@ private fun PropertySpec.Builder.resourceInitializer(
             null -> initializer("null")
             else -> initializer("%T(%L, %S)", className, items.toPluralFormsCodeBlock(), localeTag.language)
         }
+        is ArrayResource -> when (val items = resource.localizedItems[localeTag]) {
+            null -> initializer("null")
+            else if className == STRING -> initializer("arrayOf(%L)", items.joinToString(separator = ", ") { it.unescapeXmlStringValue().toKotlinStringLiteral() })
+            else -> initializer("arrayOf(%L)", items.toStringArrayCodeBlock(className))
+        }
     }
 }
 
@@ -95,6 +102,21 @@ private fun List<PluralsResource.Item>.toPluralFormsCodeBlock(): CodeBlock {
         add(joinToCode(separator = ", ", prefix = "(", suffix = ")") { item ->
             buildCodeBlock {
                 add("%L = %L", item.quantity.serialName, item.value.unescapeXmlStringValue().toKotlinStringLiteral())
+            }
+        })
+    }
+}
+
+/**
+ * ```
+ * LibresFormatFormatString("first"), LibresFormatFormatString("second")
+ * ```
+ */
+private fun List<String>.toStringArrayCodeBlock(className: ClassName): CodeBlock {
+    return buildCodeBlock {
+        add(joinToCode(separator = ", ") { item ->
+            buildCodeBlock {
+                add("%T(%L)", className, item.unescapeXmlStringValue().toKotlinStringLiteral())
             }
         })
     }
