@@ -33,7 +33,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("io.github.skeptick.libres:gradle-plugin:2.0.0-beta01")
+        classpath("io.github.skeptick.libres:gradle-plugin:2.0.0-beta02")
     }
 }
 ```
