@@ -12,16 +12,15 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 internal class LibresSourceSet(
     val inputDirectory: Directory,
     val outputDirectory: Provider<Directory>,
-    val registerGeneratedSources: (Provider<Directory>) -> Unit
+    val registerGeneratedSources: (Any) -> Unit
 )
 
 internal fun Project.LibresSourceSet(
     name: String,
-    outputDirectoryName: String,
-    registerGeneratedSources: (Provider<Directory>) -> Unit
+    registerGeneratedSources: (Any) -> Unit
 ) = LibresSourceSet(
     inputDirectory = layout.projectDirectory.dir("src/$name/libres"),
-    outputDirectory = layout.buildDirectory.dir("generated/libres/$outputDirectoryName/src"),
+    outputDirectory = layout.buildDirectory.dir("generated/libres/$name/kotlin"),
     registerGeneratedSources = registerGeneratedSources
 )
 
