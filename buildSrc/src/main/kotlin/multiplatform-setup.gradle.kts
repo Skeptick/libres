@@ -14,7 +14,6 @@ kotlin {
     android {
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
-        packaging.resources.excludes.add("META-INF/*.kotlin_module")
     }
 
     // JVM
